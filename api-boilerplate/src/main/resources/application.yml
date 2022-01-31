@@ -1,0 +1,109 @@
+# Server configuration
+server:
+  port: 5000 #set your port
+
+# Spring Boot configuration
+spring:
+  application:
+    name: kotlin-api
+  # Security configuration
+  security:
+    user:
+      name: admin
+      password: admin
+  # Database
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/db_boilerplate
+    username: demo_dev
+    password: TyBEoZT6qwVpHv
+  # JPA properties
+  jpa:
+    hibernate:
+      ddl-auto: none # When you launch the application for the first time - switch "none" at "create"
+    show-sql: false
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false # https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot
+    generate-ddl: false
+  # Date properties
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: abc@def.com
+    password: pass12345
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Logger configuration
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{executionId}] %C{1} [%M] - %m%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{executionId}] %C{1} [%M] - %m%n"
+  level:
+    ROOT: warn
+    web: info
+    de.codecentric.boot.admin.client: debug
+    org.springframework: info
+    org.hibernate: off
+  file:
+    name: logs/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 365  # Keep logs for 1 year
+
+# Mail (SMTP) configuration
+smtp:
+  server: google.com
+
+# Actuator
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    jmx:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+# App information
+info:
+  app:
+    name: Kotlin API Boilerplate
+    version: 1.0
+    description: Boilerplate to start an API in Kotlin
+
+--- # DEBUG PROFILE
+
+spring:
+  config:
+    activate:
+      on-profile: debug
+
+--- # DEV PROFILE
+
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+--- # PROD PROFILE
+
+spring:
+  config:
+    activate:
+      on-profile: prod
