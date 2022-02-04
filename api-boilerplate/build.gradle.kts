@@ -16,38 +16,40 @@ repositories {
 }
 
 dependencies {
-
+	// Springframework dependencies
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
+
+	// Kotlin and Commons
 	implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.31")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.12.5")
 	implementation("commons-validator:commons-validator:1.7")
+	implementation("commons-io:commons-io:2.6")
+	implementation("com.google.code.gson:gson:2.7")
+
+	// API Monitor
 	implementation("io.micrometer:micrometer-registry-prometheus:1.7.3")
 	implementation("io.github.mweirauch:micrometer-jvm-extras:0.2.2")
 
-	// https://mvnrepository.com/artifact/commons-io/commons-io
-	implementation("commons-io:commons-io:2.6")
-
-	// https://mvnrepository.com/artifact/com.sun.mail/javax.mail
+	// SMTP
 	implementation("com.sun.mail:javax.mail:1.6.2")
-	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-mail
 	implementation("org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE")
 
-	// https://projectlombok.org
+	// Lombok
 	compileOnly("org.projectlombok:lombok:1.18.8")
 	annotationProcessor("org.projectlombok:lombok:1.18.8")
 	testCompileOnly("org.projectlombok:lombok:1.18.8")
 	testAnnotationProcessor("org.projectlombok:lombok:1.18.8")
 
-	// https://mvnrepository.com/artifact/com.google.code.gson/gson
-	implementation("com.google.code.gson:gson:2.7")
-
+	// DBs and Testing
 	runtimeOnly("org.postgresql:postgresql")
+	testImplementation("com.h2database:h2:1.3.148")
+	testImplementation("io.mockk:mockk:1.4.1")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
 }
