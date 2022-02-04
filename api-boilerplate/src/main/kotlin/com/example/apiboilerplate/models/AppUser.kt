@@ -10,7 +10,7 @@ class AppUser: DbSoftDelete {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    val userId: Long? = null
+    var userId: Long? = null
 
     @Column(name = "email")
     lateinit var email: String
