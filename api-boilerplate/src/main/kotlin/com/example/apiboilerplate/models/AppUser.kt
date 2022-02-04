@@ -1,5 +1,6 @@
 package com.example.apiboilerplate.models
 
+import com.example.apiboilerplate.enums.UserRole
 import javax.persistence.*
 
 @Entity(name = "AppUser")
@@ -19,6 +20,9 @@ class AppUser: DbSoftDelete {
 
     @Column(name = "password")
     lateinit var password: String
+
+    @Column(name = "role")
+    var role: UserRole = UserRole.FREE
 
     constructor()
     constructor(email: String, name: String, password: String) {

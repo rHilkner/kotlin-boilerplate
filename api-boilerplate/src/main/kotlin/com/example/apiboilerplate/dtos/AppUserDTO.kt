@@ -1,5 +1,6 @@
 package com.example.apiboilerplate.dtos
 
+import com.example.apiboilerplate.enums.UserRole
 import com.fasterxml.jackson.annotation.JsonProperty
 
 data class AppUserDTO(
@@ -11,6 +12,9 @@ data class AppUserDTO(
     val email: String,
 
     @JsonProperty("name")
-    val name: String
+    val name: String,
+
+    @JsonProperty("role")
+    val role: UserRole
 
 )
