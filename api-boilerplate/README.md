@@ -44,7 +44,9 @@ Code setup
 ## Features
 
 DONE
-- Basic API config (endpoints: login, signup, forgot_password)
+- Client API: login, signup, forgot_password
+- Security: Encrypted password and JWT
+- Monitoring: Dashboard made with Spring Boot Actuator, Prometheus and Grafana
 - API log table: Any incoming request and response is saved to database (SYS_CALL_LOG)
 - Error log table: Any incoming request that results in an exception as response is saved to database with exception class, description and stack-trace (SYS_ERROR_LOG)
 - Exception handling: All app exceptions are configured in one class (ApiExceptionModule)
@@ -52,6 +54,10 @@ DONE
 - Logs
 
 TO-DO
-- TO-DO: Encrypted password and JWT
-- TO-DO: Basic email sending (SMTP) implementation
-- TO-DO: Documentation on Swagger
+- Unit Tests
+- Admin API: sign-up, login, get users, edit users, delete users
+- JWT
+- Pager Duty: Triggers email and calls phone when detects API failure
+- Forgot password: Basic email sending (SMTP) implementation
+- Docker e container
+- Documentation with SpringDocs

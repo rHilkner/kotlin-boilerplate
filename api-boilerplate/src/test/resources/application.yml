@@ -1,0 +1,15 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+  jpa:
+    defer-datasource-initialization: true
+    generate-ddl: true
+    hibernate:
+      ddl-auto: create
+    database-platform: org.hibernate.dialect.H2Dialect
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;IGNORECASE=TRUE;
+    driver-class-name: org.h2.Driver
+    username: test_user
+    password: test_password
