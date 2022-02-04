@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse
  * @author - GreenLearner(https://www.youtube.com/c/greenlearner)
  */
 @Component
-@Slf4j //@Order(1)
 class ServiceContextFilter(
     private val callLogService: CallLogService
 ) : Filter {

@@ -9,15 +9,7 @@ import org.springframework.stereotype.Service
 class CallLogService(private val sysCallLogRepository: SysCallLogRepository) {
 
     fun saveContextToSysCallLog(ctx: ServiceContext) {
-
-        val sysCallLog: SysCallLog = if (ctx.sysCallLog == null) {
-            SysCallLog(ctx)
-        } else {
-            ctx.sysCallLog!!.updateData(ctx)
-            ctx.sysCallLog!!
-        }
-
-        ctx.sysCallLog = sysCallLogRepository.save(sysCallLog)
+        ctx.sysCallLog = sysCallLogRepository.save(ctx.sysCallLog)
     }
 
 }

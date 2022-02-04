@@ -28,7 +28,11 @@ class ServiceContext(request: AppHttpRequestWrapper, response: AppHttpResponseWr
     }
 
     // Object to SYS_CALL_LOG table
-    var sysCallLog: SysCallLog? = null
+    var sysCallLog: SysCallLog = SysCallLog(this)
+        get() {
+            field.updateData(this)
+            return field
+        }
 
     // Setting request context unique execution id
     var executionId: String = UUID.randomUUID().toString()

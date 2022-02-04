@@ -1,5 +1,6 @@
 package com.example.apiboilerplate.controllers
 
+import com.example.apiboilerplate.dtos.AppUserDTO
 import com.example.apiboilerplate.dtos.SignUpDTO
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.AppUserService
@@ -18,12 +19,12 @@ class AppUserController(
     @PostMapping("/sign_up")
     fun signUp(@RequestBody @Valid signUpDTO: SignUpDTO): ResponseEntity<Any> {
         appUserService.signUpUser(signUpDTO)
-        return response("Success!", HttpStatus.OK)
+        return response(HttpStatus.OK)
     }
 
     @GetMapping("/get_user_by_email")
     @ResponseBody
-    fun getUserByEmail(@RequestParam email: String): ResponseEntity<Any> {
+    fun getUserByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<AppUserDTO>> {
         val appUserDto = appUserService.getUserByEmail(email)
 
         if (appUserDto != null) {

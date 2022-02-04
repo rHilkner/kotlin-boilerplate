@@ -13,7 +13,7 @@ abstract class AbstractController {
      * {
      *   "payload": { ... }
      * }
-     * Just keeping up the possibility to (in the future) add matadata to the response and have the following pattern:
+     * Keeping up the possibility to (in the future) add matadata to the response and have the following pattern:
      * {
      *   "payload": { ... },
      *   "metadata": { ... }
@@ -21,10 +21,14 @@ abstract class AbstractController {
      * In the boilerplate we'll keep only the "payload", but the app developer may add "metadata" if wanted
      */
 
-    private data class ResponsePayload(val payload: Any?)
+    data class ResponsePayload<T>(val payload: T?)
 
-    protected fun response(body: Any?, httpStatus: HttpStatus): ResponseEntity<Any> {
-        // Encapsulate responseBody into payload object to differ from (possible future) metadata that we might want to add later in the API
+    protected fun <T> response(body: T, httpStatus: HttpStatus): ResponseEntity<ResponsePayload<T>> {
+        // Encapsulate responseBody into payload object
         return ResponseEntity(ResponsePayload(body), httpStatus)
+    }
+
+    fun response(httpStatus: HttpStatus): ResponseEntity<Any> {
+        return ResponseEntity(httpStatus)
     }
 }
