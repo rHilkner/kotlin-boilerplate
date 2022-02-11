@@ -1,8 +1,8 @@
-package com.example.apiboilerplate.services
+package com.example.apiboilerplate.services.base
 
-import com.example.apiboilerplate.base.ServiceContext
+import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.exceptions.ApiException
-import com.example.apiboilerplate.models.SysErrorLog
+import com.example.apiboilerplate.models.base.SysErrorLog
 import com.example.apiboilerplate.repositories.SysErrorLogRepository
 import org.springframework.stereotype.Service
 
@@ -12,7 +12,7 @@ class ErrorLogService(private val sysErrorLogRepository: SysErrorLogRepository) 
     fun saveApiExceptionToSysErrorLog(apiException: ApiException) {
 
         val sysErrorLog = SysErrorLog(
-            ServiceContext.getCurrentContext()?.sysCallLog?.callLogId,
+            ApiCallContext.getCurrentApiCallContext().sysCallLog.callLogId,
             apiException.httpStatus.name,
             apiException.httpStatus.value().toString(),
             apiException.javaClass.name,

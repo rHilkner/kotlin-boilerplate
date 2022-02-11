@@ -16,7 +16,7 @@ class ValidatorService(
 
     fun validateEmail(email: String) {
         if (!EmailValidator.getInstance().isValid(email)) {
-            throw ApiExceptionModule.Auth.EmailInvalidFormatException(email)
+            throw ApiExceptionModule.Auth.InvalidEmailFormatException(email)
         }
     }
 

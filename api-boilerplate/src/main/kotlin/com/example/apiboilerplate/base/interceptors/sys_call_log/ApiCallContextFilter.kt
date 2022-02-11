@@ -1,9 +1,8 @@
-package com.example.apiboilerplate.base.filters.request_context
+package com.example.apiboilerplate.base.interceptors.sys_call_log
 
-import com.example.apiboilerplate.base.ServiceContext
+import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.base.logger.LoggerDelegate
-import com.example.apiboilerplate.services.CallLogService
-import lombok.extern.slf4j.Slf4j
+import com.example.apiboilerplate.services.base.SysCallLogService
 import org.springframework.stereotype.Component
 import java.io.IOException
 import java.util.*
@@ -11,14 +10,8 @@ import javax.servlet.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-
-/**
- * @author - GreenLearner(https://www.youtube.com/c/greenlearner)
- */
 @Component
-class ServiceContextFilter(
-    private val callLogService: CallLogService
-) : Filter {
+class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : Filter {
 
     companion object { private val log by LoggerDelegate() }
 
@@ -29,18 +22,24 @@ class ServiceContextFilter(
             response.characterEncoding = "UTF-8"; // Or whatever default. UTF-8 is good for World Domination.
         }
 
-        // Get request URI, method (GET, POST, ...) and body
+        // Instantiate wrappers for request and response objects to be able to read data
         val requestWrapper = AppHttpRequestWrapper(request as HttpServletRequest)
         val responseWrapper = AppHttpResponseWrapper(response as HttpServletResponse)
-        val ctx = ServiceContext(requestWrapper, responseWrapper)
-        callLogService.saveContextToSysCallLog(ctx)
+        val apiCallContext = ApiCallContext(requestWrapper, responseWrapper)
+        log.info("Start api-call-context with executionId [{}]", apiCallContext.executionId)
+        sysCallLogService.saveContextToSysCallLog(apiCallContext)
 
         try {
+            // Execute request
             chain.doFilter(requestWrapper, responseWrapper)
             responseWrapper.flushBuffer()
         } finally {
-            ctx.endDt = Date()
-            callLogService.saveContextToSysCallLog(ctx)
+            // Save api-session to database and clear context
+            apiCallContext.endDt = Date()
+            val executionId = apiCallContext.executionId
+            sysCallLogService.saveContextToSysCallLog(apiCallContext)
+            ApiCallContext.clearApiCallContext()
+            log.info("Finish api-call-context with executionId [{}]", executionId)
         }
 
     }

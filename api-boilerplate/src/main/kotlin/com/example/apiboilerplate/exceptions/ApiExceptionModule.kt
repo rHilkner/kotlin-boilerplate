@@ -10,16 +10,23 @@ class ApiExceptionModule {
     }
 
     class Auth {
-        class EmailInvalidFormatException(var email: String)
+        class UnauthenticatedCallException
+            : ApiException(HttpStatus.UNAUTHORIZED, "Unauthorized session for method", "")
+        class NotEnoughPrivilegesException(sessionRoles: String, var method: String)
+            : ApiException(HttpStatus.FORBIDDEN, "Not enough privileges for method", "Session roles $sessionRoles not authorized for method $method")
+        class IncorrectPasswordException()
+            : ApiException(HttpStatus.UNAUTHORIZED, "Incorrect password")
+
+        class InvalidEmailFormatException(email: String)
             : ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "Email $email not in correct format")
-        class EmailAlreadyUsedException(var email: String)
+        class EmailAlreadyUsedException(email: String)
             : ApiException(HttpStatus.CONFLICT, "Email $email already registered")
         class InvalidPasswordException(errorMessage: String, debugMessage: String?)
             : ApiException(HttpStatus.FORBIDDEN, errorMessage, debugMessage ?: errorMessage)
     }
 
     class User {
-        class UserNotFoundException(var email: String)
+        class UserNotFoundException(email: String)
             : ApiException(HttpStatus.NO_CONTENT, "User $email not found")
     }
 

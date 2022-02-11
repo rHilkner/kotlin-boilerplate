@@ -45,7 +45,7 @@ Code setup
 
 DONE
 - Client API: login, signup, forgot_password
-- Security: Encrypted password and JWT
+- Security: Encrypted password and API Session Token
 - Monitoring: Dashboard made with Spring Boot Actuator, Prometheus and Grafana
 - API log table: Any incoming request and response is saved to database (SYS_CALL_LOG)
 - Error log table: Any incoming request that results in an exception as response is saved to database with exception class, description and stack-trace (SYS_ERROR_LOG)
@@ -54,9 +54,8 @@ DONE
 - Logs
 
 TO-DO
-- Unit Tests
 - Admin API: sign-up, login, get users, edit users, delete users
-- JWT
+- Unit Tests
 - Pager Duty: Triggers email and calls phone when detects API failure
 - Forgot password: Basic email sending (SMTP) implementation
 - Docker e container

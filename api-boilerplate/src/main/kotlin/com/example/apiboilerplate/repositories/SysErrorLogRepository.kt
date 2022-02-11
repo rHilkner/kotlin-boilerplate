@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.repositories
 
-import com.example.apiboilerplate.models.SysErrorLog
+import com.example.apiboilerplate.models.base.SysErrorLog
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

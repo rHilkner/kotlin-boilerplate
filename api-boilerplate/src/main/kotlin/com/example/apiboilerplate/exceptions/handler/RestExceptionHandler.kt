@@ -1,10 +1,10 @@
 package com.example.apiboilerplate.exceptions.handler
 
-import com.example.apiboilerplate.base.ServiceContext
+import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.dtos.ApiErrorDTO
 import com.example.apiboilerplate.exceptions.ApiException
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.services.ErrorLogService
+import com.example.apiboilerplate.services.base.ErrorLogService
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.ResponseEntity
@@ -32,7 +32,7 @@ class RestExceptionHandler(private val errorLogService: ErrorLogService) : Respo
         val responseEntity = ResponseEntity(apiErrorDTO, apiException.httpStatus)
 
         // Set context variables and save context to database table SYS_ERROR_LOG
-        ServiceContext.getCurrentContext()?.apiException = apiException
+        ApiCallContext.getCurrentApiCallContext().apiException = apiException
         errorLogService.saveApiExceptionToSysErrorLog(apiException)
 
         return responseEntity

@@ -60,6 +60,12 @@ logging:
       max-file-size: 100MB
       max-history: 365  # Keep logs for 1 year
 
+# Authentication related
+authentication:
+  should-session-expire: false
+  session-expires-in: 0     # number of seconds session is valid for after last activity
+  session-token-length: 21
+
 # Mail (SMTP) configuration
 smtp:
   server: google.com

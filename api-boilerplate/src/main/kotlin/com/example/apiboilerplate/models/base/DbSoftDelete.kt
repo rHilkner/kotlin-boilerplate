@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.models
+package com.example.apiboilerplate.models.base
 
 import java.util.*
 import javax.persistence.Column

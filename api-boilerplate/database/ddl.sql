@@ -16,6 +16,8 @@ create table app_user (
 	email text not null,
     password text not null,
     role text not null,
+    status_cd boolean not null,
+    last_access_ip text,
     -- Soft delete columns
     deleted_status boolean not null default false,
     deleted_dt timestamp,
@@ -27,8 +29,19 @@ create table app_user (
     updated_by text not null
 );
 
-create unique index ux_user_1 on app_user (email);
+create unique index ux_user_1 on app_user (email, role);
 create index ix_user_1 on app_user (email);
+
+create table api_session (
+    session_id serial constraint pk_api_session primary key,
+    user_id numeric not null,
+    roles text not null,
+    token text not null,
+    ip_address text not null,
+    status_cd text not null,
+    start_dt timestamp not null,
+    last_activity_dt timestamp not null
+);
 
 create table sys_call_log (
 	call_log_id serial constraint pk_api_log primary key,

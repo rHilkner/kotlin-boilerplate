@@ -22,7 +22,7 @@ internal class AppUserControllerTest {
     @BeforeEach
     fun setup() {
         BDDMockito
-            .`when`(appUserServiceMock.getUserByEmail(ArgumentMatchers.anyObject()))
+            .`when`(appUserServiceMock.getUserDtoByEmail(ArgumentMatchers.anyObject()))
             .thenReturn(appUserCreator.createAppUserDto())
     }
 

@@ -1,9 +1,9 @@
-package com.example.apiboilerplate.dtos
+package com.example.apiboilerplate.dtos.auth
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import javax.validation.constraints.NotNull
 
-data class SignUpDTO(
+data class SignUpRequestDTO(
 
     @JsonProperty("email")
     @NotNull(message = "Email should not be null")

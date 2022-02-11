@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.base.filters.request_context
+package com.example.apiboilerplate.base.interceptors.sys_call_log
 
 import com.example.apiboilerplate.base.logger.LoggerDelegate
 import org.apache.commons.io.IOUtils
@@ -16,7 +16,7 @@ class AppHttpRequestWrapper(request: HttpServletRequest) : HttpServletRequestWra
 
     private var buffer: ByteArray?
 
-    val wrapperIp: String
+    val wrapperIpAddress: String
         get() {
             val ip: String? = getHeader("X-FORWARDED-FOR")
             return if (StringUtils.hasText(ip)) ip!! else request.remoteAddr

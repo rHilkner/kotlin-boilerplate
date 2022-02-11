@@ -1,8 +1,8 @@
-package com.example.apiboilerplate.models
+package com.example.apiboilerplate.models.base
 
-import com.example.apiboilerplate.base.ServiceContext
+import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.base.logger.LoggerDelegate
-import com.example.apiboilerplate.dtos.SignUpDTO
+import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.utils.JsonUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.*
@@ -58,30 +58,30 @@ class SysCallLog() : DbAuditable() {
     @Column(name = "end_dt")
     var endDt: Date? = null
 
-    constructor(ctx: ServiceContext) : this() {
-        updateData(ctx)
+    constructor(apiCallContext: ApiCallContext) : this() {
+        updateData(apiCallContext)
     }
 
-    fun updateData(ctx: ServiceContext) {
+    fun updateData(apiCallContext: ApiCallContext) {
 
-        this.executionId = ctx.executionId
+        this.executionId = apiCallContext.executionId
 
-        this.url = ctx.request.wrapperUrl
-        this.ip = ctx.request.wrapperIp
-        this.method = ctx.request.wrapperMethod
-        this.endpoint = ctx.request.wrapperEndpoint
-        this.parameters = ctx.request.wrapperParameters
-        this.requestHeaders = ctx.request.wrapperHeaders
+        this.url = apiCallContext.request.wrapperUrl
+        this.ip = apiCallContext.request.wrapperIpAddress
+        this.method = apiCallContext.request.wrapperMethod
+        this.endpoint = apiCallContext.request.wrapperEndpoint
+        this.parameters = apiCallContext.request.wrapperParameters
+        this.requestHeaders = apiCallContext.request.wrapperHeaders
         this.requestBody =
-            ctx.request.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(ctx.request.wrapperEndpoint, it, true) }
+            apiCallContext.request.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(apiCallContext.request.wrapperEndpoint, it, true) }
 
-        this.httpStatus = ctx.response.wrapperHttpStatus
-        this.responseHeaders = ctx.response.wrapperHeaders
+        this.httpStatus = apiCallContext.response.wrapperHttpStatus
+        this.responseHeaders = apiCallContext.response.wrapperHeaders
         this.responseBody =
-            ctx.response.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(ctx.request.wrapperEndpoint, it, false) }
+            apiCallContext.response.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(apiCallContext.request.wrapperEndpoint, it, false) }
 
-        this.startDt = ctx.startDt
-        this.endDt = ctx.endDt
+        this.startDt = apiCallContext.startDt
+        this.endDt = apiCallContext.endDt
         this.updatedDt = Date()
     }
 
@@ -92,9 +92,9 @@ class SysCallLog() : DbAuditable() {
 
         // Blur password field on incoming sign_up requests
         if ("/sign_up".equals(endpoint, ignoreCase = true) && isRequest) {
-            val signUpDTO: SignUpDTO = objectMapper.readValue(body, SignUpDTO::class.java)
-            signUpDTO.password = "****"
-            bodyBlurred = objectMapper.writeValueAsString(signUpDTO)
+            val signUpRequestDTO: SignUpRequestDTO = objectMapper.readValue(body, SignUpRequestDTO::class.java)
+            signUpRequestDTO.password = "****"
+            bodyBlurred = objectMapper.writeValueAsString(signUpRequestDTO)
         }
 
         return try {
