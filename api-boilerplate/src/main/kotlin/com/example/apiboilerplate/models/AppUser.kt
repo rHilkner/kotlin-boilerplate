@@ -4,16 +4,25 @@ import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.base.DbSoftDelete
-import javax.persistence.*
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.MappedSuperclass
 
-@Entity(name = "AppUser")
-@Table(name = "app_user", schema = "public")
-class AppUser: DbSoftDelete {
+@MappedSuperclass
+abstract class AppUser: DbSoftDelete {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    var userId: Long? = null
+    val userId: Long?
+        get() {
+            when (this) {
+                is AppCustomer -> {
+                    return this.customerId
+                }
+                is AppAdmin -> {
+                    return this.adminId
+                }
+            }
+            throw RuntimeException()
+        }
 
     @Column(name = "email")
     lateinit var email: String
@@ -24,9 +33,19 @@ class AppUser: DbSoftDelete {
     @Column(name = "password")
     lateinit var password: String
 
-    @Convert(converter = UserRole.Converter::class)
-    @Column(name = "role")
-    lateinit var role: UserRole
+    val role: UserRole
+        get() {
+            when (this) {
+                is AppCustomer -> {
+                    return UserRole.CUSTOMER
+                }
+                is AppAdmin -> {
+                    return UserRole.ADMIN
+                }
+            }
+            throw RuntimeException()
+        }
+
 
     @Convert(converter = StatusCd.Converter::class)
     @Column(name = "status_cd")
@@ -36,11 +55,10 @@ class AppUser: DbSoftDelete {
     var lastAccessIp: String? = null
 
     constructor()
-    constructor(email: String, name: String, password: String, role: UserRole) {
+    constructor(email: String, name: String, password: String) {
         this.email = email
         this.name = name
         this.password = password
-        this.role = role
         this.lastAccessIp = ApiCallContext.getCurrentApiCallContext().request.wrapperIpAddress
     }
 

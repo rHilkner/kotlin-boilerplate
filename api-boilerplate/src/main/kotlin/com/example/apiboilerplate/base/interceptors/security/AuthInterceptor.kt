@@ -2,12 +2,9 @@ package com.example.apiboilerplate.base.interceptors.security
 
 import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.base.logger.LoggerDelegate
-import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.services.base.AuthService
-import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.ModelAndView
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 

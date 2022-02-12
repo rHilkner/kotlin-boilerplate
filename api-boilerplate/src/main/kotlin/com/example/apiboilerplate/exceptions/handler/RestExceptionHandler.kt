@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.exceptions.handler
 
 import com.example.apiboilerplate.base.ApiCallContext
-import com.example.apiboilerplate.dtos.ApiErrorDTO
+import com.example.apiboilerplate.dtos.exception.ApiErrorDTO
 import com.example.apiboilerplate.exceptions.ApiException
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.base.ErrorLogService
@@ -27,7 +27,7 @@ class RestExceptionHandler(private val errorLogService: ErrorLogService) : Respo
     private fun handleException(ex: Exception): ResponseEntity<ApiErrorDTO> {
 
         // Create ApiErrorDTO and response entity for exception
-        val apiException = if (ex is ApiException) ex else ApiExceptionModule.General.UnexpectedException(ex)
+        val apiException = if (ex is ApiException) ex else ApiExceptionModule.General.UnexpectedException("Unexpected error", ex.stackTraceToString())
         val apiErrorDTO = ApiErrorDTO(apiException)
         val responseEntity = ResponseEntity(apiErrorDTO, apiException.httpStatus)
 

@@ -2,7 +2,9 @@ package com.example.apiboilerplate.base
 
 import com.example.apiboilerplate.base.interceptors.sys_call_log.AppHttpRequestWrapper
 import com.example.apiboilerplate.base.interceptors.sys_call_log.AppHttpResponseWrapper
+import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiException
+import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.base.ApiSession
 import com.example.apiboilerplate.models.base.SysCallLog
 import org.slf4j.MDC
@@ -46,6 +48,9 @@ class ApiCallContext(request: AppHttpRequestWrapper, response: AppHttpResponseWr
     var apiSession: ApiSession? = null
     val currentUserId: Long?
         get() = apiSession?.userId
+    val currentUserRole: UserRole?
+        get() = apiSession?.role
+    var currentUser: AppUser? = null
 
     // Object to SYS_CALL_LOG table
     var sysCallLog: SysCallLog = SysCallLog(this)

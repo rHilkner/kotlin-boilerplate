@@ -10,14 +10,42 @@ error; -- just to making sure you're not executing this file without reading
 
 -- DDL
 
-create table app_user (
-	user_id serial constraint pk_user primary key,
-	name text not null,
-	email text not null,
+create table app_admin (
+    -- User common columns
+    admin_id serial constraint pk_admin primary key,
+    name text not null,
+    email text not null,
     password text not null,
-    role text not null,
     status_cd boolean not null,
+    last_access_dt timestamp not null,
     last_access_ip text,
+    -- Customer specific columns
+    -- NONE
+    -- Soft delete columns
+    deleted_status boolean not null default false,
+    deleted_dt timestamp,
+    deleted_by text,
+    -- Audit columns
+    created_dt timestamp not null default now(),
+    created_by text not null,
+    updated_dt timestamp not null,
+    updated_by text not null
+);
+
+create table app_customer (
+    -- User common columns
+    customer_id serial constraint pk_customer primary key,
+    name text not null,
+    email text not null,
+    password text not null,
+    status_cd boolean not null,
+    last_access_dt timestamp not null,
+    last_access_ip text,
+    -- Customer specific columns
+    phone text,
+    document_id text,
+    address text,
+    address_complement text,
     -- Soft delete columns
     deleted_status boolean not null default false,
     deleted_dt timestamp,

@@ -5,8 +5,8 @@ import org.springframework.http.HttpStatus
 class ApiExceptionModule {
 
     class General {
-        class UnexpectedException(ex: Exception)
-            : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error", ex.stackTraceToString())
+        class UnexpectedException(errorMessage: String, debugMessage: String = errorMessage)
+            : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
     }
 
     class Auth {

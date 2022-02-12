@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.util
 
-import com.example.apiboilerplate.dtos.AppUserDTO
-import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
+import com.example.apiboilerplate.dtos.AppAdminDTO
+import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.AppUser
 
@@ -23,12 +23,12 @@ class AppUserCreator {
         return appUser
     }
 
-    fun createSignUpDto(): SignUpRequestDTO {
-        return SignUpRequestDTO("john.silva@abcmail.com", "John Silva", "XE$%GD(A")
+    fun createSignUpDto(): AdminSignUpRequestDTO {
+        return AdminSignUpRequestDTO("john.silva@abcmail.com", "John Silva", "XE$%GD(A")
     }
 
-    fun createAppUserDto(): AppUserDTO {
-        return AppUserDTO(1, "John Silva", "john.silva@abcmail.com", UserRole.USER)
+    fun createAppUserDto(): AppAdminDTO {
+        return AppAdminDTO(1, "John Silva", "john.silva@abcmail.com", UserRole.USER)
     }
 
 }

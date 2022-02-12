@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.dtos
+package com.example.apiboilerplate.dtos.exception
 
 import com.example.apiboilerplate.exceptions.ApiException
 import com.fasterxml.jackson.annotation.JsonProperty

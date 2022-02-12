@@ -9,6 +9,7 @@ import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.base.ApiSession
 import com.example.apiboilerplate.repositories.ApiSessionRepository
+import com.example.apiboilerplate.services.AppUserService
 import com.example.apiboilerplate.utils.RandomString
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
@@ -21,7 +22,8 @@ import javax.servlet.http.HttpServletRequest
 @Service
 class AuthService(
     private val passwordEncoder: PasswordEncoder,
-    private val apiSessionRepository: ApiSessionRepository
+    private val apiSessionRepository: ApiSessionRepository,
+    private val appUserService: AppUserService
 ) {
 
     companion object { private val log by LoggerDelegate() }
@@ -102,16 +104,11 @@ class AuthService(
 
     fun getAuthTokenFromRequest(request: HttpServletRequest): String? {
         // Get the Authorization header from the request
-        val authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION)
-
-        if (authorizationHeader == null) {
-            log.debug("Missing authorization header")
-            return null
-        }
+        val authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION) ?: return null
 
         val authorizationHeaderComponents = authorizationHeader.split(" ".toRegex()).toTypedArray()
         if (authorizationHeaderComponents.size != 2 || authorizationHeaderComponents[0] != AUTHENTICATION_SCHEME) {
-            log.debug("Missing authorization token")
+            log.debug("Authorization token incorrect format")
             return null
         }
 

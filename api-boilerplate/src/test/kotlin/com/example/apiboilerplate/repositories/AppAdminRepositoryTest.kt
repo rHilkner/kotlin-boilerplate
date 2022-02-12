@@ -1,6 +1,5 @@
 package com.example.apiboilerplate.repositories
 
-import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.util.AppUserCreator
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
@@ -11,10 +10,10 @@ import org.springframework.data.repository.findByIdOrNull
 
 @DataJpaTest
 @DisplayName("Tests for AppUser Repository")
-class AppUserRepositoryTest {
+class AppAdminRepositoryTest {
 
     @Autowired
-    lateinit var appUserRepository: AppUserRepository
+    lateinit var appAdminRepository: AppAdminRepository
 
     val appUserCreator = AppUserCreator()
 
@@ -22,7 +21,7 @@ class AppUserRepositoryTest {
     fun save_CreateAppUser_WhenSuccessful() {
         // Create and save
         val appUser = appUserCreator.createAppUserToBeSaved()
-        val appUserSaved = appUserRepository.save(appUser)
+        val appUserSaved = appAdminRepository.save(appUser)
         // Assertions
         Assertions.assertNotNull(appUserSaved)
         Assertions.assertNotNull(appUserSaved.userId)
@@ -36,11 +35,11 @@ class AppUserRepositoryTest {
     fun save_UpdateAppUser_WhenSuccessful() {
         // Create and save
         val appUser = appUserCreator.createAppUserToBeSaved()
-        val appUserSaved = appUserRepository.save(appUser)
+        val appUserSaved = appAdminRepository.save(appUser)
         // Update
         appUserSaved.name = "Mary Sousa"
         appUserSaved.email = "mary.sousa@gmail.com"
-        val appUserUpdated = appUserRepository.save(appUserSaved)
+        val appUserUpdated = appAdminRepository.save(appUserSaved)
         // Assertions
         Assertions.assertEquals(appUserSaved.name, appUserUpdated.name)
         Assertions.assertNotNull(appUserUpdated)
@@ -51,10 +50,10 @@ class AppUserRepositoryTest {
     fun delete_RemoveAppUser_WhenSuccessful() {
         // Create and save
         val appUser = appUserCreator.createAppUserToBeSaved()
-        val appUserSaved = appUserRepository.save(appUser)
+        val appUserSaved = appAdminRepository.save(appUser)
         // Delete
-        appUserRepository.delete(appUserSaved)
-        val appUserDeleted = appUserRepository.findByIdOrNull(appUserSaved.userId!!)
+        appAdminRepository.delete(appUserSaved)
+        val appUserDeleted = appAdminRepository.findByIdOrNull(appUserSaved.userId!!)
         // Assertions
         Assertions.assertNull(appUserDeleted)
     }
@@ -63,9 +62,9 @@ class AppUserRepositoryTest {
     fun findByEmail_ReturnsAppUser_WhenSuccessful() {
         // Create and save
         val appUser = appUserCreator.createAppUserToBeSaved()
-        appUserRepository.save(appUser)
+        appAdminRepository.save(appUser)
         // Find user by email
-        val appUserByEmail = appUserRepository.getAppUserByEmail(appUser.email)
+        val appUserByEmail = appAdminRepository.getAppAdminByEmail(appUser.email)
         // Assertions
         Assertions.assertNotNull(appUserByEmail)
     }

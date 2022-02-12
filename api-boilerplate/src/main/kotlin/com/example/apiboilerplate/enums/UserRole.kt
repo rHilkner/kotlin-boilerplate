@@ -10,10 +10,6 @@ enum class UserRole: PersistableEnum, DTOEnum {
         override var dbValue = "CUSTOMER"
         override var dtoValue = "Customer"
     },
-    RETAILER {
-        override var dbValue = "RETAILER"
-        override var dtoValue = "Retailer"
-    },
     ADMIN {
         override var dbValue = "ADMIN"
         override var dtoValue = "Admin"

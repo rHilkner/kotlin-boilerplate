@@ -1,12 +1,12 @@
 package com.example.apiboilerplate.repositories
 
-import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.models.AppAdmin
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface AppUserRepository: JpaRepository<AppUser, Long> {
+interface AppAdminRepository: JpaRepository<AppAdmin, Long> {
 
-    fun getAppUserByEmail(email: String) : AppUser?
+    fun getAppAdminByEmail(email: String) : AppAdmin?
 
 }
