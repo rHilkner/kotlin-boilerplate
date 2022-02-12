@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.base.interceptors.sys_call_log
 
-import com.example.apiboilerplate.base.logger.LoggerDelegate
+import com.example.apiboilerplate.base.logger.ApiLogger
 import org.apache.commons.io.IOUtils
 import org.springframework.util.StringUtils
 import java.io.ByteArrayInputStream
@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequestWrapper
 
 class AppHttpRequestWrapper(request: HttpServletRequest) : HttpServletRequestWrapper(request) {
 
-    companion object { private val log by LoggerDelegate() }
+    companion object { private val log by ApiLogger() }
 
     private var buffer: ByteArray?
 

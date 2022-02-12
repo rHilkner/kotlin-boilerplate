@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository
 interface AppCustomerRepository: JpaRepository<AppCustomer, Long> {
 
     fun getAppCustomerByEmail(email: String) : AppCustomer?
+    fun deleteByCustomerId(customerId: Long)
 
 }

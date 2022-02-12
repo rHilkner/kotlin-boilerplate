@@ -2,7 +2,7 @@ package com.example.apiboilerplate.services.base
 
 import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.base.interceptors.security.Secured
-import com.example.apiboilerplate.base.logger.LoggerDelegate
+import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
@@ -26,7 +26,7 @@ class AuthService(
     private val appUserService: AppUserService
 ) {
 
-    companion object { private val log by LoggerDelegate() }
+    companion object { private val log by ApiLogger() }
 
     private val AUTHENTICATION_SCHEME = "Bearer"
 
@@ -139,7 +139,7 @@ class AuthService(
         if (!securedRoles.contains(apiSession.role)) {
             // No role in session in secured group - don't authorize.
             log.warn("No session roles authorized for request: [{}]", request.requestURI)
-            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.role.name, request.method)
+            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.role, request.method)
         }
 
         // One of session's roles is in the secured role group - authorize.

@@ -20,6 +20,18 @@ class AppCustomerDTO {
     @JsonProperty("name")
     lateinit var name: String
 
+    @JsonProperty("phone")
+    lateinit var phone: String
+
+    @JsonProperty("document_id")
+    lateinit var documentId: String
+
+    @JsonProperty("address")
+    lateinit var address: String
+
+    @JsonProperty("address_complement")
+    lateinit var addressComplement: String
+
     @JsonProperty("role")
     var role: UserRole = UserRole.CUSTOMER
 

@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.base.interceptors.sys_call_log
 
 import com.example.apiboilerplate.base.ApiCallContext
-import com.example.apiboilerplate.base.logger.LoggerDelegate
+import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.services.base.SysCallLogService
 import org.springframework.stereotype.Component
 import java.io.IOException
@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : Filter {
 
-    companion object { private val log by LoggerDelegate() }
+    companion object { private val log by ApiLogger() }
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {

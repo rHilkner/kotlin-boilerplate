@@ -2,16 +2,15 @@ package com.example.apiboilerplate.controllers
 
 import com.example.apiboilerplate.base.interceptors.security.Secured
 import com.example.apiboilerplate.dtos.AppCustomerDTO
-import com.example.apiboilerplate.dtos.auth.*
+import com.example.apiboilerplate.dtos.auth.AuthAppCustomerResponseDTO
+import com.example.apiboilerplate.dtos.auth.CustomerSignUpRequestDTO
+import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
 import com.example.apiboilerplate.enums.UserRole
-import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.AppCustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
-
-@CrossOrigin(maxAge = 3600)
 
 @RestController
 @RequestMapping("/customer")
@@ -30,21 +29,15 @@ class AppCustomerController(
     }
 
     @Secured([UserRole.CUSTOMER])
-    @GetMapping("/profile")
-    fun getAppUser(): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
+    @GetMapping("/get_current_user")
+    fun getCurrentUser(): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
         return response(appCustomerService.getCurrentCustomerDto(), HttpStatus.OK)
     }
 
     @Secured([UserRole.CUSTOMER])
-    @GetMapping("/get_by_email")
-    fun getUserByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
-        val appUserDto = appCustomerService.getCustomerDtoByEmail(email)
-
-        if (appUserDto != null) {
-            return response(appUserDto, HttpStatus.OK)
-        } else {
-            throw ApiExceptionModule.User.UserNotFoundException(email)
-        }
+    @PostMapping("/update_current_user")
+    fun updateCurrentUser(@RequestBody newAppCustomerDTO: AppCustomerDTO): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
+        return response(appCustomerService.updateCurrentCustomer(newAppCustomerDTO), HttpStatus.OK)
     }
 
 }

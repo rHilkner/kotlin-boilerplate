@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.models.base
 
 import com.example.apiboilerplate.base.ApiCallContext
-import com.example.apiboilerplate.base.logger.LoggerDelegate
+import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.utils.JsonUtils
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -12,7 +12,7 @@ import javax.persistence.*
 @Table(name = "sys_call_log", schema = "public")
 class SysCallLog() : DbAuditable() {
 
-    companion object { private val log by LoggerDelegate() }
+    companion object { private val log by ApiLogger() }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

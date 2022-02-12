@@ -5,10 +5,8 @@ import org.slf4j.LoggerFactory
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
-class LoggerDelegate : ReadOnlyProperty<Any, Logger> {
-
-    // import as `companion object { private val log by LoggerDelegate() }`
-    private lateinit var log: Logger
+lateinit var log: Logger
+class ApiLogger : ReadOnlyProperty<Any, Logger> {
 
     override fun getValue(thisRef: Any, property: KProperty<*>): Logger {
         if (!::log.isInitialized) log = LoggerFactory.getLogger(thisRef.javaClass)

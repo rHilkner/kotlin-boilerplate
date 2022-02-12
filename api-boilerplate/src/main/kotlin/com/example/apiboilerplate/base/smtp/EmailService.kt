@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.base.smtp
 
-import com.example.apiboilerplate.base.logger.LoggerDelegate
+import com.example.apiboilerplate.base.logger.ApiLogger
 import lombok.extern.java.Log
 import lombok.extern.slf4j.Slf4j
 import org.springframework.beans.factory.annotation.Value
@@ -19,7 +19,7 @@ import javax.mail.internet.MimeMessage
 @Service
 class EmailService {
 
-    companion object { private val log by LoggerDelegate() }
+    companion object { private val log by ApiLogger() }
 
     @Value("\${smtp.server}")
     private val EMAIL_SERVER: String? = null

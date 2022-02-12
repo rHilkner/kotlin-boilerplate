@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository
 interface AppAdminRepository: JpaRepository<AppAdmin, Long> {
 
     fun getAppAdminByEmail(email: String) : AppAdmin?
+    fun deleteByAdminId(adminId: Long)
 
 }

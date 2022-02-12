@@ -4,6 +4,7 @@ import com.example.apiboilerplate.base.ApiCallContext
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.base.DbSoftDelete
+import java.util.*
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.MappedSuperclass
@@ -50,6 +51,9 @@ abstract class AppUser: DbSoftDelete {
     @Convert(converter = StatusCd.Converter::class)
     @Column(name = "status_cd")
     var statusCd: StatusCd = StatusCd.ACTIVE
+
+    @Column(name = "last_access_dt")
+    var lastAccessDt: Date? = null
 
     @Column(name = "last_access_ip")
     var lastAccessIp: String? = null

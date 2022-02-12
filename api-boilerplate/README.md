@@ -45,6 +45,7 @@ Code setup
 
 DONE
 - Client API: login, signup, forgot_password
+- Admin API: sign-up, login, get users, edit users, delete users
 - Security: Encrypted password and API Session Token
 - Monitoring: Dashboard made with Spring Boot Actuator, Prometheus and Grafana
 - API log table: Any incoming request and response is saved to database (SYS_CALL_LOG)
@@ -54,7 +55,6 @@ DONE
 - Logs
 
 TO-DO
-- Admin API: sign-up, login, get users, edit users, delete users
 - Unit Tests
 - Pager Duty: Triggers email and calls phone when detects API failure
 - Forgot password: Basic email sending (SMTP) implementation
