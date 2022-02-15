@@ -7,8 +7,8 @@ import com.example.apiboilerplate.models.AppAdmin
 
 class AppAdminConverter {
 
-    fun signUpDtoToAppAdmin(adminSignUpRequestDTO: AdminSignUpRequestDTO): AppAdmin {
-        return AppAdmin(adminSignUpRequestDTO)
+    fun signUpDtoToAppAdmin(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String): AppAdmin {
+        return AppAdmin(adminSignUpRequestDTO, passwordHash)
     }
 
     fun appAdminToAppAdminDto(appAdmin: AppAdmin): AppAdminDTO {

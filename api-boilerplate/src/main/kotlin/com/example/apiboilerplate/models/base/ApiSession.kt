@@ -17,6 +17,7 @@ class ApiSession() {
 
     constructor(appUser: AppUser, token: String, ipAddress: String) : this(token, ipAddress) {
         this.userId = appUser.userId!!
+        this.role = appUser.role
     }
 
     @Id

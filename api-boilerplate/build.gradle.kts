@@ -41,7 +41,7 @@ dependencies {
 
 	// SMTP
 	implementation("com.sun.mail:javax.mail:1.6.2")
-	implementation("org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE")
+	implementation("org.springframework.boot:spring-boot-starter-mail:2.6.3")
 
 	// Lombok
 	compileOnly("org.projectlombok:lombok:1.18.8")

@@ -1,6 +1,7 @@
 package com.example.apiboilerplate.exceptions.handler
 
 import com.example.apiboilerplate.base.ApiCallContext
+import com.example.apiboilerplate.base.logger.log
 import com.example.apiboilerplate.dtos.exception.ApiErrorDTO
 import com.example.apiboilerplate.exceptions.ApiException
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
@@ -26,6 +27,9 @@ class RestExceptionHandler(private val errorLogService: ErrorLogService) : Respo
      */
     private fun handleException(ex: Exception): ResponseEntity<ApiErrorDTO> {
 
+        // Log error
+        log.error("The following exception is being saved to database by RestExceptionHandler", ex)
+
         // Create ApiErrorDTO and response entity for exception
         val apiException = if (ex is ApiException) ex else ApiExceptionModule.General.UnexpectedException("Unexpected error", ex.stackTraceToString())
         val apiErrorDTO = ApiErrorDTO(apiException)
@@ -34,6 +38,8 @@ class RestExceptionHandler(private val errorLogService: ErrorLogService) : Respo
         // Set context variables and save context to database table SYS_ERROR_LOG
         ApiCallContext.getCurrentApiCallContext().apiException = apiException
         errorLogService.saveApiExceptionToSysErrorLog(apiException)
+
+        log.debug("Exception successfully saved to database, responding API")
 
         return responseEntity
     }

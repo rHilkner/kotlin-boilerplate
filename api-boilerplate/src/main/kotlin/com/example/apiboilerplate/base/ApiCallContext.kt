@@ -15,7 +15,10 @@ import java.util.*
  * across business method calls. It contains diagnostic information about the call (request and response), most
  * importantly a unique transaction ID which can be user to track this service invocation.
  */
-class ApiCallContext(request: AppHttpRequestWrapper, response: AppHttpResponseWrapper) {
+class ApiCallContext(
+    var request: AppHttpRequestWrapper,
+    var response: AppHttpResponseWrapper
+) {
 
     companion object {
         private var EXECUTION_ID_KEY = "executionId"
@@ -35,9 +38,6 @@ class ApiCallContext(request: AppHttpRequestWrapper, response: AppHttpResponseWr
     // Set request context unique execution id
     var executionId: String = UUID.randomUUID().toString()
 
-    // Request/Response
-    var request: AppHttpRequestWrapper
-    var response: AppHttpResponseWrapper
     var startDt: Date = Date()
     var endDt: Date? = null
 
@@ -63,8 +63,6 @@ class ApiCallContext(request: AppHttpRequestWrapper, response: AppHttpResponseWr
         MDC.remove(EXECUTION_ID_KEY)
         MDC.put(EXECUTION_ID_KEY, this.executionId)
         threadLocal.set(this)
-        this.request = request
-        this.response = response
     }
 
 }

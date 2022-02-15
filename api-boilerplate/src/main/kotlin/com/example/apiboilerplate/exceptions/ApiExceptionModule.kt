@@ -33,4 +33,9 @@ class ApiExceptionModule {
             : ApiException(HttpStatus.NO_CONTENT, "User $email not found")
     }
 
+    class Email {
+        class FailedToSendEmail(email: String)
+            : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to send email to $email")
+    }
+
 }

@@ -30,13 +30,13 @@ class AuthService(
 
     private val AUTHENTICATION_SCHEME = "Bearer"
 
-    @Value("\${authentication.should-session-expire}")
+    @Value("\${boilerplate-env.authentication.should-session-expire}")
     private val shouldSessionExpire = false
 
-    @Value("\${authentication.session-expires-in}")
+    @Value("\${boilerplate-env.authentication.session-expires-in}")
     private val sessionExpiresIn = 0L
 
-    @Value("\${authentication.session-token-length}")
+    @Value("\${boilerplate-env.authentication.session-token-length}")
     private val sessionTokenLength = 0
 
     private val randomString by lazy { RandomString(sessionTokenLength) }
@@ -61,7 +61,7 @@ class AuthService(
     }
 
     fun authenticate(appUser: AppUser, password: String): ApiSession {
-        if (!passwordMatchesEncoded(password, appUser.password)) {
+        if (!passwordMatchesEncoded(password, appUser.passwordHash)) {
             throw ApiExceptionModule.Auth.IncorrectPasswordException()
         }
         return createAndSaveApiSession(appUser)

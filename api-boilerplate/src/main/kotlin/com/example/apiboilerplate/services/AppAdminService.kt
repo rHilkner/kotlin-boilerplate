@@ -1,6 +1,7 @@
 package com.example.apiboilerplate.services
 
 import com.example.apiboilerplate.base.logger.ApiLogger
+import com.example.apiboilerplate.controllers.SendEmailRequest
 import com.example.apiboilerplate.converters.AppAdminConverter
 import com.example.apiboilerplate.dtos.AppAdminDTO
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
@@ -12,6 +13,7 @@ import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.repositories.AppAdminRepository
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.SecurityService
+import com.example.apiboilerplate.services.email.EmailService
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,6 +22,7 @@ class AppAdminService(
     private val appAdminRepository: AppAdminRepository,
     private val authService: AuthService,
     private val appUserService: AppUserService,
+    private val emailService: EmailService,
     private val securityService: SecurityService
 ) {
 
@@ -33,7 +36,7 @@ class AppAdminService(
         log.info("Login in admin with email [${loginRequestDTO.email}]")
 
         // Get user from database
-        val appAdmin = appAdminRepository.getAppAdminByEmail(loginRequestDTO.email)
+        val appAdmin = appAdminRepository.findAppAdminByEmail(loginRequestDTO.email)
             ?: throw ApiExceptionModule.User.UserNotFoundException(loginRequestDTO.email)
         // Authenticate user
         val apiSession = authService.authenticate(appAdmin, loginRequestDTO.password)
@@ -47,18 +50,22 @@ class AppAdminService(
 
         // Validate and encode password
         validatorService.validatePassword(adminSignUpRequestDTO.password)
-        adminSignUpRequestDTO.password = authService.encodePassword(adminSignUpRequestDTO.password)
 
         // Validate user information
         validatorService.validateEmail(adminSignUpRequestDTO.email)
         validatorService.validateEmailAlreadyUsed(adminSignUpRequestDTO.email)
 
         // Create new user
-        var newAppAdmin = appAdminConverter.signUpDtoToAppAdmin(adminSignUpRequestDTO)
+        val passwordHash = authService.encodePassword(adminSignUpRequestDTO.password)
+        var newAppAdmin = appAdminConverter.signUpDtoToAppAdmin(adminSignUpRequestDTO, passwordHash)
         newAppAdmin = appAdminRepository.save(newAppAdmin)
+
+        log.info("New admin was created with email [${adminSignUpRequestDTO.email}] and id [${newAppAdmin.adminId}]")
 
         // Authenticate user
         val apiSession = authService.authenticate(newAppAdmin, adminSignUpRequestDTO.password)
+
+        log.info("New admin authenticated with email [${adminSignUpRequestDTO.email}] with token [${apiSession.token}]")
 
         // If no error was thrown, return response dto
         return AuthAppAdminResponseDTO(apiSession.token, appAdminConverter.appAdminToAppAdminDto(newAppAdmin))
@@ -71,7 +78,7 @@ class AppAdminService(
 
     fun getAdminDtoByEmail(email: String): AppAdminDTO? {
         log.debug("Getting admin with email [$email]")
-        val appAdmin = appAdminRepository.getAppAdminByEmail(email)
+        val appAdmin = appAdminRepository.findAppAdminByEmail(email)
         return appAdmin?.let { appAdminConverter.appAdminToAppAdminDto(it) }
     }
 
@@ -112,6 +119,10 @@ class AppAdminService(
         securityService.verifyRoleForCurrentUser(UserRole.ADMIN)
         log.debug("Deleting app-admin [$adminId]")
         appAdminRepository.deleteByAdminId(adminId)
+    }
+
+    fun sendEmail(sendEmailRequest: SendEmailRequest) {
+        emailService.send(sendEmailRequest.to, sendEmailRequest.text)
     }
 
 }

@@ -31,8 +31,8 @@ abstract class AppUser: DbSoftDelete {
     @Column(name = "name")
     lateinit var name: String
 
-    @Column(name = "password")
-    lateinit var password: String
+    @Column(name = "password_hash")
+    lateinit var passwordHash: String
 
     val role: UserRole
         get() {
@@ -53,7 +53,7 @@ abstract class AppUser: DbSoftDelete {
     var statusCd: StatusCd = StatusCd.ACTIVE
 
     @Column(name = "last_access_dt")
-    var lastAccessDt: Date? = null
+    var lastAccessDt: Date = Date()
 
     @Column(name = "last_access_ip")
     var lastAccessIp: String? = null
@@ -62,7 +62,7 @@ abstract class AppUser: DbSoftDelete {
     constructor(email: String, name: String, password: String) {
         this.email = email
         this.name = name
-        this.password = password
+        this.passwordHash = password
         this.lastAccessIp = ApiCallContext.getCurrentApiCallContext().request.wrapperIpAddress
     }
 

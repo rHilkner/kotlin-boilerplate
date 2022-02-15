@@ -92,4 +92,9 @@ class AppAdminController(
         return response(appAdminService.deleteAdmin(adminId), HttpStatus.OK)
     }
 
+    @PostMapping("/send_email")
+    fun sendEmail(@RequestBody sendEmailRequest: SendEmailRequest): ResponseEntity<ResponsePayload<Any?>> {
+        return response(appAdminService.sendEmail(sendEmailRequest), HttpStatus.OK)
+    }
+
 }

@@ -28,7 +28,7 @@ class AppAdminRepositoryTest {
         Assertions.assertEquals(appUser.email, appUserSaved.email)
         Assertions.assertEquals(appUser.name, appUserSaved.name)
         Assertions.assertEquals(appUser.role, appUserSaved.role)
-        Assertions.assertEquals(appUser.password, appUserSaved.password)
+        Assertions.assertEquals(appUser.passwordHash, appUserSaved.passwordHash)
     }
 
     @Test
@@ -64,7 +64,7 @@ class AppAdminRepositoryTest {
         val appUser = appUserCreator.createAppUserToBeSaved()
         appAdminRepository.save(appUser)
         // Find user by email
-        val appUserByEmail = appAdminRepository.getAppAdminByEmail(appUser.email)
+        val appUserByEmail = appAdminRepository.findAppAdminByEmail(appUser.email)
         // Assertions
         Assertions.assertNotNull(appUserByEmail)
     }

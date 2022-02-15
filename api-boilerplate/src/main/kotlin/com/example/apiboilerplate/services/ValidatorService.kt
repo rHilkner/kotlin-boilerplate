@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class ValidatorService(
-    private val appUserDAO: AppAdminRepository,
+    private val appAdminRepository: AppAdminRepository,
 ) {
 
     fun validateEmail(email: String) {
@@ -21,7 +21,7 @@ class ValidatorService(
     }
 
     fun validateEmailAlreadyUsed(email: String) {
-        if (appUserDAO.getAppAdminByEmail(email) != null) {
+        if (appAdminRepository.findAppAdminByEmail(email) != null) {
             throw ApiExceptionModule.Auth.EmailAlreadyUsedException(email)
         }
     }

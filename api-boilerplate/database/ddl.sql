@@ -15,8 +15,8 @@ create table app_admin (
     admin_id serial constraint pk_admin primary key,
     name text not null,
     email text not null,
-    password text not null,
-    status_cd boolean not null,
+    password_hash text not null,
+    status_cd text not null,
     last_access_dt timestamp not null,
     last_access_ip text,
     -- Customer specific columns
@@ -37,8 +37,8 @@ create table app_customer (
     customer_id serial constraint pk_customer primary key,
     name text not null,
     email text not null,
-    password text not null,
-    status_cd boolean not null,
+    password_hash text not null,
+    status_cd text not null,
     last_access_dt timestamp not null,
     last_access_ip text,
     -- Customer specific columns
@@ -57,8 +57,7 @@ create table app_customer (
     updated_by text not null
 );
 
-create unique index ux_user_1 on app_user (email, role);
-create index ix_user_1 on app_user (email);
+create unique index ux_user_1 on app_customer (email);
 
 create table api_session (
     session_id serial constraint pk_api_session primary key,

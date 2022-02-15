@@ -21,7 +21,7 @@ object ObjectUtil {
                 // make sure properties have same name and compatible types
                 it.name == targetProp.name && targetProp.returnType.isSupertypeOf(it.returnType)
             }?.let { matchingProp ->
-                targetProp.setter.call(this, matchingProp.getter.call(fromObject))
+                targetProp.setter.call(toObject, matchingProp.getter.call(fromObject))
             }
         }
 

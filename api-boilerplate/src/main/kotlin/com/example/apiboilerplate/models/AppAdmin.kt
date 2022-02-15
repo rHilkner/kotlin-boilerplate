@@ -2,6 +2,7 @@ package com.example.apiboilerplate.models
 
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.utils.ObjectUtil
+import java.util.*
 import javax.persistence.*
 
 @Entity(name = "AppAdmin")
@@ -14,8 +15,9 @@ class AppAdmin: AppUser {
     var adminId: Long? = null
 
     constructor()
-    constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO) {
+    constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String) {
         ObjectUtil.copyProps(this, adminSignUpRequestDTO)
+        this.passwordHash = passwordHash
     }
 
 }

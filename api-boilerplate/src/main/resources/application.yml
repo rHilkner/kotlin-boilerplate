@@ -2,6 +2,13 @@
 server:
   port: 5000 #set your port
 
+# App information
+info:
+  app:
+    name: Kotlin API Boilerplate
+    version: 1.0
+    description: Boilerplate to start an API in Kotlin
+
 # Spring Boot configuration
 spring:
   application:
@@ -16,7 +23,7 @@ spring:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/db_boilerplate
     username: demo_dev
-    password: TyBEoZT6qwVpHv
+    password: ${db_password}
   # JPA properties
   jpa:
     hibernate:
@@ -31,16 +38,21 @@ spring:
     serialization:
       write-dates-as-timestamps: true
   mail:
-    host: smtp.gmail.com
-    port: 587
-    username: abc@def.com
-    password: pass12345
+    host: localhost
+    port: 1025
+    username: email_username
+    password: password
     properties:
       mail:
         smtp:
+          ssl:
+            trust: "*"
           auth: true
           starttls:
             enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
 
 # Logger configuration
 logging:
@@ -60,16 +72,6 @@ logging:
       max-file-size: 100MB
       max-history: 365  # Keep logs for 1 year
 
-# Authentication related
-authentication:
-  should-session-expire: false
-  session-expires-in: 0     # number of seconds session is valid for after last activity
-  session-token-length: 21
-
-# Mail (SMTP) configuration
-smtp:
-  server: google.com
-
 # Actuator
 management:
   metrics:
@@ -81,17 +83,19 @@ management:
         include: "*"
     jmx:
       exposure:
-        include: '*'
+        include: "*"
   endpoint:
     health:
       show-details: always
 
-# App information
-info:
-  app:
-    name: Kotlin API Boilerplate
-    version: 1.0
-    description: Boilerplate to start an API in Kotlin
+boilerplate-env:
+  server:
+    domain: boilerplate.com
+  # Authentication related
+  authentication:
+    should-session-expire: false
+    session-expires-in: 1000000     # number of seconds session is valid for after last activity
+    session-token-length: 21
 
 --- # DEBUG PROFILE
 
@@ -102,13 +106,18 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none # When you launch the application for the first time - switch "none" at "create"
-    show-sql: true
+    show-sql: false
+  mail:
+    host: localhost
+    port: 1025
+    username: email_username
+    password: password
 
 logging:
   level:
     ROOT: warn
     web: info
-    de.codecentric.boot.admin.client: debug
+    com.example.apiboilerplate: debug
     org.springframework: info
     org.hibernate: off
 
