@@ -15,6 +15,7 @@ import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.repositories.AppCustomerRepository
+import com.example.apiboilerplate.services.base.ApiSessionService
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.EmailService
 import com.example.apiboilerplate.services.base.SecurityService
@@ -25,6 +26,7 @@ class AppCustomerService(
     private val validatorService: ValidatorService,
     private val appCustomerRepository: AppCustomerRepository,
     private val authService: AuthService,
+    private val apiSessionService: ApiSessionService,
     private val appUserService: AppUserService,
     private val emailService: EmailService,
     private val securityService: SecurityService
@@ -76,12 +78,20 @@ class AppCustomerService(
 
     fun forgotPassword(email: String) {
         log.info("Customer [$email] forgot password")
-        // Create new api-session with RESET_PASSWORD permission
-        val appAdmin = appCustomerRepository.findAppCustomerByEmail(email)
+
+        // Get user from repository
+        val appCustomer = appCustomerRepository.findAppCustomerByEmail(email)
             ?: throw ApiExceptionModule.User.UserNotFoundException(email)
-        val apiSession = authService.createAndSaveApiSession(appAdmin, listOf(Permission.RESET_PASSWORD), false)
+
+        // Create new api-session with RESET_PASSWORD permission
+        val sessionToken = authService.generateNewSessionToken()
+        val apiSession = apiSessionService.createAndSaveApiSession(appCustomer, sessionToken, listOf(Permission.RESET_PASSWORD), false)
+
         // Send to user's email session token to reset password
-        emailService.send(AppEmails.ADMIN, email, "Forgot password", "To change password use session-token: " + apiSession.token)
+        emailService.send(AppEmails.ADMIN, email, "Forgot password",
+            "To change password use session-token: " + apiSession.token)
+
+        log.debug("Sent email to recover password to user [${appCustomer.role} / ${appCustomer.email}]")
     }
 
     fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
@@ -114,7 +124,7 @@ class AppCustomerService(
         log.debug("Changed admin password with email [${currentAppAdmin.email}]")
 
         // Inactivate current session after successful password reset
-        authService.inactivateCurrentSession()
+        apiSessionService.inactivateCurrentSession()
     }
 
     fun getCurrentCustomer(): AppCustomer {

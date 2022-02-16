@@ -15,6 +15,7 @@ import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.repositories.AppAdminRepository
+import com.example.apiboilerplate.services.base.ApiSessionService
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.EmailService
 import com.example.apiboilerplate.services.base.SecurityService
@@ -25,6 +26,7 @@ class AppAdminService(
     private val validatorService: ValidatorService,
     private val appAdminRepository: AppAdminRepository,
     private val authService: AuthService,
+    private val apiSessionService: ApiSessionService,
     private val appUserService: AppUserService,
     private val emailService: EmailService,
     private val securityService: SecurityService
@@ -76,12 +78,20 @@ class AppAdminService(
 
     fun forgotPassword(email: String) {
         log.info("Admin [$email] forgot password")
-        // Create new api-session with RESET_PASSWORD permission
+
+        // Get user from repository
         val appAdmin = appAdminRepository.findAppAdminByEmail(email)
             ?: throw ApiExceptionModule.User.UserNotFoundException(email)
-        val apiSession = authService.createAndSaveApiSession(appAdmin, listOf(Permission.RESET_PASSWORD), false)
+
+        // Create new api-session with RESET_PASSWORD permission
+        val sessionToken = authService.generateNewSessionToken()
+        apiSessionService.createAndSaveApiSession(appAdmin, sessionToken, listOf(Permission.RESET_PASSWORD), false)
+
         // Send to user's email session token to reset password
-        emailService.send(AppEmails.ADMIN, email, "Forgot password", "To change password use session-token: " + apiSession.token)
+        emailService.send(AppEmails.ADMIN, email, "Forgot password",
+            "To change password use session-token: $sessionToken")
+
+        log.debug("Sent email to recover password to user [${appAdmin.role} / ${appAdmin.email}]")
     }
 
     fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
@@ -114,7 +124,7 @@ class AppAdminService(
         log.debug("Changed admin password with email [${currentAppAdmin.email}]")
 
         // Inactivate current session after successful password reset
-        authService.inactivateCurrentSession()
+        apiSessionService.inactivateCurrentSession()
     }
 
     fun getCurrentAdmin(): AppAdmin {

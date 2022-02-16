@@ -1,6 +1,5 @@
 package com.example.apiboilerplate.services.base
 
-import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.annotations.SecuredPermission
 import com.example.apiboilerplate.base.annotations.SecuredRole
 import com.example.apiboilerplate.base.interceptors.sys_call_log.AppHttpRequestWrapper
@@ -11,22 +10,18 @@ import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.base.ApiSession
-import com.example.apiboilerplate.repositories.base.ApiSessionRepository
-import com.example.apiboilerplate.services.AppUserService
 import com.example.apiboilerplate.utils.RandomString
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.method.HandlerMethod
-import java.util.*
 import javax.servlet.http.HttpServletRequest
 
 @Service
 class AuthService(
     private val passwordEncoder: PasswordEncoder,
-    private val apiSessionRepository: ApiSessionRepository,
-    private val appUserService: AppUserService
+    private val apiSessionService: ApiSessionService
 ) {
 
     companion object { private val log by ApiLogger() }
@@ -44,6 +39,16 @@ class AuthService(
 
     private val randomString by lazy { RandomString(sessionTokenLength) }
 
+    /**
+     * Creates a new random token to be used as UserSession token.
+     * https://automationrhapsody.com/implement-secure-rest-api-authentication-http/
+     *
+     * @return a random session token.
+     */
+    fun generateNewSessionToken(): String {
+        return this.randomString.nextString()
+    }
+
     fun encodePassword(password: String): String {
         return passwordEncoder.encode(password)
     }
@@ -57,53 +62,24 @@ class AuthService(
         if (!passwordMatchesEncoded(password, appUser.passwordHash)) {
             throw ApiExceptionModule.Auth.IncorrectPasswordException()
         }
-        return createAndSaveApiSession(appUser)
-    }
-
-    fun createAndSaveApiSession(appUser: AppUser, permissions: List<Permission> = listOf(), renewExpiration: Boolean = true): ApiSession {
-        log.info("Creating new session for user [${appUser.email}] with role and permissions [${appUser.role} / $permissions]")
-        val newApiSession = ApiSession(appUser, permissions, getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress, renewExpiration)
-        val apiSession = apiSessionRepository.save(newApiSession)
-        ApiSessionContext.getCurrentApiCallContext().apiSession = apiSession
-        return apiSession
+        return apiSessionService.createAndSaveApiSession(appUser, generateNewSessionToken())
     }
 
     fun authenticate(request: HttpServletRequest): ApiSession {
         log.debug("Attempting to authenticate request: [{}]", request)
+
+        // Get session-token from request or create new session
         val authToken = getAuthTokenFromRequest(request)
-        return getApiSession(authToken)
-    }
+            ?: return apiSessionService.createNewApiSession(generateNewSessionToken())
 
-    fun createBlankApiSession(): ApiSession {
-        return ApiSession(getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress)
-    }
+        // Get session from token
+        val apiSession = apiSessionService.getActiveApiSession(authToken)
+        // Validate session not expired
+        apiSessionService.validateApiSession(apiSession, shouldSessionExpire, sessionExpiresIn)
 
-    private fun getApiSession(token: String?): ApiSession {
+        log.debug("Request authenticated")
 
-        if (token == null || token.isEmpty()) {
-            return createBlankApiSession()
-        }
-
-        val apiSession = apiSessionRepository.getApiSessionByTokenAndStatusCd(token, StatusCd.ACTIVE)
-
-        if (apiSession == null) {
-            log.debug("Invalid authorization token [{}]", token)
-            return createBlankApiSession()
-        }
-
-        if (shouldSessionExpire) {
-            val sessionExpirationDtMillis = apiSession.startDt.time + 1000*sessionExpiresIn
-            val now = Date().time
-            if (now > sessionExpirationDtMillis) {
-                log.debug("Session expired, returning new session")
-                return createBlankApiSession()
-            }
-        }
-
-        apiSession.lastActivityDt = Date()
-
-        return apiSessionRepository.save(apiSession)
-
+        return apiSession
     }
 
     fun getAuthTokenFromRequest(request: HttpServletRequest): String? {
@@ -210,24 +186,6 @@ class AuthService(
 
         // Return the list
         return securedPermission?.value?.toList() ?: listOf()
-    }
-
-    /**
-     * Creates a new random token to be used as UserSession token.
-     * https://automationrhapsody.com/implement-secure-rest-api-authentication-http/
-     *
-     * @return a random session token.
-     */
-    fun getNewSessionToken(): String {
-        return this.randomString.nextString()
-    }
-
-    fun inactivateCurrentSession() {
-        val currentSession = ApiSessionContext.getCurrentApiCallContext().apiSession!!
-        log.info("Inactivating session with id [${currentSession.sessionId}]")
-        currentSession.statusCd = StatusCd.INACTIVE
-        apiSessionRepository.save(currentSession)
-        log.debug("Session with id [${currentSession.sessionId}] inactivated")
     }
 
 }

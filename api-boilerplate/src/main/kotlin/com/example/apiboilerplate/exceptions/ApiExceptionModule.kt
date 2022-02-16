@@ -21,6 +21,10 @@ class ApiExceptionModule {
             constructor(permissionList: List<Permission>, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method: Insufficient permission", "Session permissions [${permissionList.toList()}] not authorized for method $method")
             constructor(errorMessage: String, debugMessage: String = errorMessage): super(HttpStatus.FORBIDDEN, errorMessage, debugMessage)
         }
+        class InvalidSessionToken(token: String)
+            : ApiException(HttpStatus.FORBIDDEN, "Invalid session token [$token]")
+        class ExpiredSessionToken(token: String)
+            : ApiException(HttpStatus.FORBIDDEN, "Expired session token [$token]")
         class IncorrectPasswordException
             : ApiException(HttpStatus.UNAUTHORIZED, "Incorrect password")
 
