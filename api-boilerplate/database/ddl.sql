@@ -10,12 +10,17 @@ error; -- just to making sure you're not executing this file without reading
 
 -- DDL
 
-create table app_user (
-	user_id serial constraint pk_user primary key,
-	name text not null,
-	email text not null,
-    password text not null,
-    role text not null,
+create table app_admin (
+    -- User common columns
+    admin_id serial constraint pk_admin primary key,
+    name text not null,
+    email text not null,
+    password_hash text not null,
+    status_cd text not null,
+    last_access_dt timestamp not null,
+    last_access_ip text,
+    -- Customer specific columns
+    -- NONE
     -- Soft delete columns
     deleted_status boolean not null default false,
     deleted_dt timestamp,
@@ -27,8 +32,50 @@ create table app_user (
     updated_by text not null
 );
 
-create unique index ux_user_1 on app_user (email);
-create index ix_user_1 on app_user (email);
+create unique index ux_admin_1 on app_admin (email);
+
+create table app_customer (
+    -- User common columns
+    customer_id serial constraint pk_customer primary key,
+    name text not null,
+    email text not null,
+    password_hash text not null,
+    status_cd text not null,
+    last_access_dt timestamp not null,
+    last_access_ip text,
+    -- Customer specific columns
+    phone text,
+    document_id text,
+    address text,
+    address_complement text,
+    -- Soft delete columns
+    deleted_status boolean not null default false,
+    deleted_dt timestamp,
+    deleted_by text,
+    -- Audit columns
+    created_dt timestamp not null default now(),
+    created_by text not null,
+    updated_dt timestamp not null,
+    updated_by text not null
+);
+
+create unique index ux_customer_1 on app_customer (email);
+
+create table api_session (
+    session_id serial constraint pk_api_session primary key,
+    user_id numeric not null,
+    role text not null,
+    permissions text not null,
+    token text not null,
+    ip_address text,
+    status_cd text not null,
+    start_dt timestamp not null,
+    last_activity_dt timestamp not null,
+    expires_in numeric,
+    renew_expiration boolean not null
+);
+
+create index ix_customer_1 on api_session (token);
 
 create table sys_call_log (
 	call_log_id serial constraint pk_api_log primary key,
@@ -69,13 +116,14 @@ create table sys_error_log (
     updated_by text not null
 );
 
-create table sys_smtp_log (
-	smtp_log_id serial constraint pk_smtp_log primary key,
+create table sys_email_log (
+	email_log_id serial constraint pk_smtp_log primary key,
     call_log_id int,
-    from_email_addr text not null,
-    to_email_addr text not null,
-    email_subject text,
-    email_body text,
+    from_addr text not null,
+    to_addr text not null,
+    subject text not null,
+    body text not null,
+    sent_status_cd text,
     -- Audit columns
     created_dt timestamp not null default now(),
     created_by text not null,

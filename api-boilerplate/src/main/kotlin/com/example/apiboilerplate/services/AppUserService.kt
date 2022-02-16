@@ -1,41 +1,62 @@
 package com.example.apiboilerplate.services
 
-import com.example.apiboilerplate.converters.AppUserConverter
-import com.example.apiboilerplate.dtos.AppUserDTO
-import com.example.apiboilerplate.dtos.SignUpDTO
-import com.example.apiboilerplate.repositories.AppUserRepository
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
+import com.example.apiboilerplate.base.ApiSessionContext
+import com.example.apiboilerplate.base.logger.ApiLogger
+import com.example.apiboilerplate.enums.UserRole
+import com.example.apiboilerplate.exceptions.ApiExceptionModule
+import com.example.apiboilerplate.models.AppAdmin
+import com.example.apiboilerplate.models.AppCustomer
+import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.repositories.AppAdminRepository
+import com.example.apiboilerplate.repositories.AppCustomerRepository
 import org.springframework.stereotype.Service
+import java.util.*
 
 @Service
 class AppUserService(
-    private val validatorService: ValidatorService,
-    private val appUserDAO: AppUserRepository,
-    private val passwordEncoder: PasswordEncoder
+    private val appAdminRepository: AppAdminRepository,
+    private val appCustomerRepository: AppCustomerRepository
 ) {
 
-    private val appUserConverter = AppUserConverter()
+    companion object { private val log by ApiLogger() }
 
-    fun signUpUser(signUpDTO: SignUpDTO) {
-        // Validate and hide password
-        validatorService.validatePassword(signUpDTO.password)
-        signUpDTO.password = encodePassword(signUpDTO.password)
-        // Validate user information
-        validatorService.validateEmail(signUpDTO.email)
-        validatorService.validateEmailAlreadyUsed(signUpDTO.email)
-        // Create new user
-        val newAppUser = appUserConverter.signUpDtoToAppUser(signUpDTO)
-        appUserDAO.save(newAppUser)
+    fun getCurrentUserFromDb(cached: Boolean = false): AppUser? {
+
+        if (cached && ApiSessionContext.getCurrentApiCallContext().currentUser != null) {
+            return ApiSessionContext.getCurrentApiCallContext().currentUser
+        }
+
+        log.debug("Selecting current session's user from database")
+
+        // Check if there is a current user
+        val userId = ApiSessionContext.getCurrentApiCallContext().currentUserId ?: return null
+        val userRole = ApiSessionContext.getCurrentApiCallContext().currentUserRole
+            ?: throw ApiExceptionModule.General.UnexpectedException("User role not found")
+
+        // Get user from database
+        val appUser = when (userRole) {
+            UserRole.ADMIN -> appAdminRepository.getById(userId)
+            UserRole.CUSTOMER -> appCustomerRepository.getById(userId)
+        }
+
+        // Update user
+        val appUserUpdated = updateLastActivityDt(appUser)
+        ApiSessionContext.getCurrentApiCallContext().currentUser = appUserUpdated
+
+        log.debug("Current session's user with id [${appUserUpdated.userId}] selected from database")
+
+        return appUser
     }
 
-    private fun encodePassword(password: String): String {
-        return passwordEncoder.encode(password)
-    }
-
-    fun getUserByEmail(email: String): AppUserDTO? {
-        val appUser = appUserDAO.getAppUserByEmail(email)
-        return appUser?.let { appUserConverter.appUserToAppUserDto(it) }
+    fun updateLastActivityDt(appUser: AppUser): AppUser {
+        log.debug("Updating lastActivityDt of user [${appUser.userId}]")
+        appUser.lastAccessDt = Date()
+        val updatedAppUser = when (appUser.role) {
+            UserRole.ADMIN -> appAdminRepository.save(appUser as AppAdmin)
+            UserRole.CUSTOMER -> appCustomerRepository.save(appUser as AppCustomer)
+        }
+        log.debug("lastActivityDt updated for user [${appUser.userId}]")
+        return updatedAppUser
     }
 
 }

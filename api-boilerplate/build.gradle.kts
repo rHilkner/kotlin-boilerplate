@@ -32,13 +32,16 @@ dependencies {
 	implementation("commons-io:commons-io:2.6")
 	implementation("com.google.code.gson:gson:2.7")
 
+	// Security
+	implementation("com.auth0:java-jwt:3.18.3")
+
 	// API Monitor
 	implementation("io.micrometer:micrometer-registry-prometheus:1.7.3")
 	implementation("io.github.mweirauch:micrometer-jvm-extras:0.2.2")
 
 	// SMTP
 	implementation("com.sun.mail:javax.mail:1.6.2")
-	implementation("org.springframework.boot:spring-boot-starter-mail:1.2.0.RELEASE")
+	implementation("org.springframework.boot:spring-boot-starter-mail:2.6.3")
 
 	// Lombok
 	compileOnly("org.projectlombok:lombok:1.18.8")

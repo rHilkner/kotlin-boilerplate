@@ -1,16 +1,29 @@
 package com.example.apiboilerplate.models
 
+import com.example.apiboilerplate.base.ApiSessionContext
+import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
-import javax.persistence.*
+import com.example.apiboilerplate.models.base.DbSoftDelete
+import java.util.*
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.MappedSuperclass
 
-@Entity(name = "AppUser")
-@Table(name = "app_user", schema = "public")
-class AppUser: DbSoftDelete {
+@MappedSuperclass
+abstract class AppUser: DbSoftDelete {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    var userId: Long? = null
+    val userId: Long?
+        get() {
+            when (this) {
+                is AppCustomer -> {
+                    return this.customerId
+                }
+                is AppAdmin -> {
+                    return this.adminId
+                }
+            }
+            throw RuntimeException()
+        }
 
     @Column(name = "email")
     lateinit var email: String
@@ -18,17 +31,39 @@ class AppUser: DbSoftDelete {
     @Column(name = "name")
     lateinit var name: String
 
-    @Column(name = "password")
-    lateinit var password: String
+    @Column(name = "password_hash")
+    lateinit var passwordHash: String
 
-    @Column(name = "role")
-    var role: UserRole = UserRole.FREE
+    val role: UserRole
+        get() {
+            when (this) {
+                is AppCustomer -> {
+                    return UserRole.CUSTOMER
+                }
+                is AppAdmin -> {
+                    return UserRole.ADMIN
+                }
+            }
+            throw RuntimeException()
+        }
+
+
+    @Convert(converter = StatusCd.Converter::class)
+    @Column(name = "status_cd")
+    var statusCd: StatusCd = StatusCd.ACTIVE
+
+    @Column(name = "last_access_dt")
+    var lastAccessDt: Date = Date()
+
+    @Column(name = "last_access_ip")
+    var lastAccessIp: String? = null
 
     constructor()
     constructor(email: String, name: String, password: String) {
         this.email = email
         this.name = name
-        this.password = password
+        this.passwordHash = password
+        this.lastAccessIp = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
     }
 
 }

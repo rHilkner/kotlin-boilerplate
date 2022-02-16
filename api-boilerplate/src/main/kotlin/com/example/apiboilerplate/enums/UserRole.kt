@@ -6,13 +6,13 @@ import com.example.apiboilerplate.enums.converters.PersistableEnum
 
 enum class UserRole: PersistableEnum, DTOEnum {
 
-    FREE {
-        override var dbValue = "FREE"
-        override var dtoValue = "Free"
+    CUSTOMER {
+        override var dbValue = "CUSTOMER"
+        override var dtoValue = "Customer"
     },
-    PREMIUM {
-        override var dbValue = "PREMIUM"
-        override var dtoValue = "Premium"
+    ADMIN {
+        override var dbValue = "ADMIN"
+        override var dtoValue = "Admin"
     };
 
     class Converter : DbEnumConverter<UserRole>(UserRole::class.java)
