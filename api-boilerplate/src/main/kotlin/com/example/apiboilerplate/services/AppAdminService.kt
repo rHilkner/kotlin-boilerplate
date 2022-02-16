@@ -15,8 +15,8 @@ import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.repositories.AppAdminRepository
 import com.example.apiboilerplate.services.base.AuthService
-import com.example.apiboilerplate.services.base.SecurityService
 import com.example.apiboilerplate.services.base.EmailService
+import com.example.apiboilerplate.services.base.SecurityService
 import org.springframework.stereotype.Service
 
 @Service
