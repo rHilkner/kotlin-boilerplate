@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.services.base
 
 import com.example.apiboilerplate.base.ApiSessionContext
-import com.example.apiboilerplate.repositories.SysCallLogRepository
+import com.example.apiboilerplate.repositories.base.SysCallLogRepository
 import org.springframework.stereotype.Service
 
 @Service

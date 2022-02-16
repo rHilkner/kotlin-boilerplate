@@ -11,7 +11,7 @@ import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.base.ApiSession
-import com.example.apiboilerplate.repositories.ApiSessionRepository
+import com.example.apiboilerplate.repositories.base.ApiSessionRepository
 import com.example.apiboilerplate.services.AppUserService
 import com.example.apiboilerplate.utils.RandomString
 import org.springframework.beans.factory.annotation.Value

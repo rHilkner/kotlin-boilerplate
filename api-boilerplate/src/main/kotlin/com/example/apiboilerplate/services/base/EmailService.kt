@@ -6,7 +6,7 @@ import com.example.apiboilerplate.enums.AppEmails
 import com.example.apiboilerplate.enums.EmailSentStatusCd
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.base.SysEmailLog
-import com.example.apiboilerplate.repositories.SysEmailLogRepository
+import com.example.apiboilerplate.repositories.base.SysEmailLogRepository
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
 import org.springframework.scheduling.annotation.Async

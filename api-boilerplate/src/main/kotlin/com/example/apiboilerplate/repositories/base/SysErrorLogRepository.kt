@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.repositories
+package com.example.apiboilerplate.repositories.base
 
 import com.example.apiboilerplate.models.base.SysErrorLog
 import org.springframework.data.jpa.repository.JpaRepository

@@ -3,7 +3,7 @@ package com.example.apiboilerplate.services.base
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.exceptions.ApiException
 import com.example.apiboilerplate.models.base.SysErrorLog
-import com.example.apiboilerplate.repositories.SysErrorLogRepository
+import com.example.apiboilerplate.repositories.base.SysErrorLogRepository
 import org.springframework.stereotype.Service
 
 @Service

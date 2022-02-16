@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.repositories
+package com.example.apiboilerplate.repositories.base
 
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.models.base.ApiSession
