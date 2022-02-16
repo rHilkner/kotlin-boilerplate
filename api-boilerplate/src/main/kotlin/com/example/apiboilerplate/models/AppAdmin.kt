@@ -2,7 +2,6 @@ package com.example.apiboilerplate.models
 
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.utils.ObjectUtil
-import java.util.*
 import javax.persistence.*
 
 @Entity(name = "AppAdmin")

@@ -2,22 +2,21 @@ package com.example.apiboilerplate.services
 
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.controllers.SendEmailRequest
 import com.example.apiboilerplate.converters.AppAdminConverter
 import com.example.apiboilerplate.dtos.AppAdminDTO
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.dtos.auth.AuthAppAdminResponseDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
 import com.example.apiboilerplate.dtos.auth.ResetPasswordRequest
+import com.example.apiboilerplate.enums.AppEmails
 import com.example.apiboilerplate.enums.Permission
-import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.repositories.AppAdminRepository
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.SecurityService
-import com.example.apiboilerplate.services.email.EmailService
+import com.example.apiboilerplate.services.base.EmailService
 import org.springframework.stereotype.Service
 
 @Service
@@ -76,14 +75,12 @@ class AppAdminService(
     }
 
     fun forgotPassword(email: String) {
-        // TODO: create new api-session with RESET_PASSWORD permission
-        // TODO: send to user's email URL to reset password
-        // TODO: this URL must contain token from api-session created above
-        // example url: ${domain}/admin/reset_password?sessionToken=ABLUBLUBLE123
+        // Create new api-session with RESET_PASSWORD permission
         val appAdmin = appAdminRepository.findAppAdminByEmail(email)
             ?: throw ApiExceptionModule.User.UserNotFoundException(email)
         val apiSession = authService.createAndSaveApiSession(appAdmin, listOf(Permission.RESET_PASSWORD), false)
-        emailService.send(email, "To change password use session-token: " + apiSession.token)
+        // Send to user's email session token to reset password
+        emailService.send(AppEmails.ADMIN, email, "Forgot password", "To change password use session-token: " + apiSession.token)
     }
 
     fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
@@ -171,10 +168,6 @@ class AppAdminService(
         securityService.verifyRoleForCurrentUser(UserRole.ADMIN)
         log.debug("Deleting app-admin [$adminId]")
         appAdminRepository.deleteByAdminId(adminId)
-    }
-
-    fun sendEmail(sendEmailRequest: SendEmailRequest) {
-        emailService.send(sendEmailRequest.to, sendEmailRequest.text)
     }
 
 }

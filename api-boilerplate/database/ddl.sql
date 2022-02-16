@@ -116,13 +116,14 @@ create table sys_error_log (
     updated_by text not null
 );
 
-create table sys_smtp_log (
-	smtp_log_id serial constraint pk_smtp_log primary key,
+create table sys_email_log (
+	email_log_id serial constraint pk_smtp_log primary key,
     call_log_id int,
-    from_email_addr text not null,
-    to_email_addr text not null,
-    email_subject text,
-    email_body text,
+    from_addr text not null,
+    to_addr text not null,
+    subject text not null,
+    body text not null,
+    sent_status_cd text,
     -- Audit columns
     created_dt timestamp not null default now(),
     created_by text not null,

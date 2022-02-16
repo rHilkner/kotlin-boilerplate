@@ -56,6 +56,7 @@ class AuthService(
     }
 
     fun createAndSaveApiSession(appUser: AppUser, permissions: List<Permission> = listOf(), renewExpiration: Boolean = true): ApiSession {
+        log.info("Creating new session for user [${appUser.email}] with role and permissions [${appUser.role} / $permissions]")
         val newApiSession = ApiSession(appUser, permissions, getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress, renewExpiration)
         val apiSession = apiSessionRepository.save(newApiSession)
         ApiSessionContext.getCurrentApiCallContext().apiSession = apiSession
