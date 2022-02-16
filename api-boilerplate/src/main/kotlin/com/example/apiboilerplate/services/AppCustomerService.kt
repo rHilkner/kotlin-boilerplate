@@ -59,7 +59,7 @@ class AppCustomerService(
 
         // Validate user information
         validatorService.validateEmail(customerSignUpRequestDTO.email)
-        validatorService.validateEmailAlreadyUsed(customerSignUpRequestDTO.email)
+        validatorService.validateEmailAlreadyUsed(customerSignUpRequestDTO.email, UserRole.CUSTOMER)
 
         // Create new user
         val passwordHash = authService.encodePassword(customerSignUpRequestDTO.password)

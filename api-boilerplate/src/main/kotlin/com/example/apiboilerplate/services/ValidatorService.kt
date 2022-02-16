@@ -1,7 +1,9 @@
 package com.example.apiboilerplate.services
 
+import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.repositories.AppAdminRepository
+import com.example.apiboilerplate.repositories.AppCustomerRepository
 import org.apache.commons.validator.routines.EmailValidator
 import org.springframework.stereotype.Service
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service
 @Service
 class ValidatorService(
     private val appAdminRepository: AppAdminRepository,
+    private val appCustomerRepository: AppCustomerRepository
 ) {
 
     fun validateEmail(email: String) {
@@ -20,8 +23,14 @@ class ValidatorService(
         }
     }
 
-    fun validateEmailAlreadyUsed(email: String) {
-        if (appAdminRepository.findAppAdminByEmail(email) != null) {
+    fun validateEmailAlreadyUsed(email: String, userRole: UserRole) {
+        // Try to find user with email
+        val appUser = when (userRole) {
+            UserRole.CUSTOMER -> appCustomerRepository.findAppCustomerByEmail(email)
+            UserRole.ADMIN -> appAdminRepository.findAppAdminByEmail(email)
+        }
+        // If user found, throw exception
+        if (appUser != null) {
             throw ApiExceptionModule.Auth.EmailAlreadyUsedException(email)
         }
     }

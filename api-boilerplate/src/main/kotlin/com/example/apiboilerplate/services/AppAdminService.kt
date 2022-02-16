@@ -59,7 +59,7 @@ class AppAdminService(
 
         // Validate user information
         validatorService.validateEmail(adminSignUpRequestDTO.email)
-        validatorService.validateEmailAlreadyUsed(adminSignUpRequestDTO.email)
+        validatorService.validateEmailAlreadyUsed(adminSignUpRequestDTO.email, UserRole.ADMIN)
 
         // Create new user
         val passwordHash = authService.encodePassword(adminSignUpRequestDTO.password)
