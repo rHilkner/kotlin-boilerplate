@@ -65,7 +65,7 @@ create table api_session (
     session_id serial constraint pk_api_session primary key,
     user_id numeric not null,
     role text not null,
-    permissions text not null,
+    permissions text,
     token text not null,
     ip_address text,
     status_cd text not null,
@@ -79,7 +79,7 @@ create index ix_customer_1 on api_session (token);
 
 create table sys_call_log (
 	call_log_id serial constraint pk_api_log primary key,
-    execution_id text not null,
+    transaction_id text not null,
     url text,
     ip text,
     method text,

@@ -7,7 +7,7 @@ import kotlin.reflect.full.memberProperties
 
 object ObjectUtil {
 
-    fun <T : Any, R : Any> copyProps(toObject: T, fromObject: R, vararg props: KProperty<*>): T {
+    fun <T : Any, R : Any> copyProps(fromObject: R, toObject: T, vararg props: KProperty<*>): T {
 
         // only consider mutable properties
         val mutableProps = toObject::class.memberProperties.filterIsInstance<KMutableProperty<*>>()

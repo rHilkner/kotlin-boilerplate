@@ -36,7 +36,7 @@ class ApiSession() {
     /** Roles of the user associated to permission (customer, admin) */
     @Convert(converter = UserRole.Converter::class)
     @Column(name = "role")
-    lateinit var role: UserRole
+    var role: UserRole? = null
 
     /** Permissions on API - forgot-password feature sends a tokeb by email that have permission to reset password, for example */
     @Column(name = "permissions")
@@ -51,7 +51,8 @@ class ApiSession() {
         }
 
     fun setPermissions(permissionList: List<Permission>) {
-        this._permissions = permissionList.joinToString(",") { p -> p.dbValue }
+        val permissionListStr = permissionList.joinToString(",") { p -> p.dbValue }
+        this._permissions = permissionListStr.ifEmpty { null }
     }
 
     fun addPermission(permission: Permission) {

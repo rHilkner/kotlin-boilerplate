@@ -15,7 +15,7 @@ class AuthInterceptor(private var authService: AuthService) : HandlerInterceptor
 
         val apiSession = authService.authenticate(request)
         ApiSessionContext.getCurrentApiCallContext().apiSession = apiSession
-        authService.authorize(request, apiSession, handler)
+        authService.authorize(ApiSessionContext.getCurrentApiCallContext().request, apiSession, handler)
 
         return true
     }

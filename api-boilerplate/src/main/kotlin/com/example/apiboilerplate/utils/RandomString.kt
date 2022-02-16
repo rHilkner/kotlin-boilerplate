@@ -4,18 +4,16 @@ import java.security.SecureRandom
 import java.util.*
 
 class RandomString(
-    private val length: Int = 21,
-    private var random: Random = SecureRandom(),
-    private var symbols: String = alphanum,
-    private var buf: CharArray = CharArray(length)
+    length: Int,
+    private var symbols: String = alphanum
 ) {
+
+    private var buf: CharArray = CharArray(length)
+    private var random: Random = SecureRandom()
 
     init {
         require(length >= 1)
         require(symbols.length >= 2)
-        this.random = Objects.requireNonNull(random)
-        this.symbols = symbols.toCharArray().toString()
-        this.buf = CharArray(length)
     }
 
     /**

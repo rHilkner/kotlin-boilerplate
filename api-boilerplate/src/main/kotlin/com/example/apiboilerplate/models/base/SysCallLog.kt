@@ -19,8 +19,8 @@ class SysCallLog() : DbAuditable() {
     @Column(name = "call_log_id")
     var callLogId: Long? = null
 
-    @Column(name = "execution_id")
-    lateinit var executionId: String
+    @Column(name = "transaction_id")
+    lateinit var transactionId: String
 
     @Column(name = "url")
     var url: String? = null
@@ -64,7 +64,7 @@ class SysCallLog() : DbAuditable() {
 
     fun updateData(apiSessionContext: ApiSessionContext) {
 
-        this.executionId = apiSessionContext.executionId
+        this.transactionId = apiSessionContext.transactionId
 
         this.url = apiSessionContext.request.wrapperUrl
         this.ip = apiSessionContext.request.wrapperIpAddress

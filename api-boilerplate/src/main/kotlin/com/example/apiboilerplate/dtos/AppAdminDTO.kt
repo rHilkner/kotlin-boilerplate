@@ -5,15 +5,14 @@ import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.utils.ObjectUtil
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class AppAdminDTO {
+class AppAdminDTO(appAdmin: AppAdmin) {
 
-    constructor(appAdmin: AppAdmin, role: UserRole) {
-        ObjectUtil.copyProps(this, appAdmin)
-        this.role = role
+    init {
+        ObjectUtil.copyProps(appAdmin, this)
     }
 
     @JsonProperty("adminId")
-    var adminId: Long = 0
+    var adminId: Long? = null
 
     @JsonProperty("email")
     lateinit var email: String
@@ -22,6 +21,6 @@ class AppAdminDTO {
     lateinit var name: String
 
     @JsonProperty("role")
-    lateinit var role: UserRole
+    var role: UserRole = UserRole.ADMIN
 
 }

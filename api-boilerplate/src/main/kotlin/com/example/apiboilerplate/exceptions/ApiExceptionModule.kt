@@ -9,13 +9,15 @@ class ApiExceptionModule {
     class General {
         class UnexpectedException(errorMessage: String, debugMessage: String = errorMessage)
             : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
+        class NullPointer(errorMessage: String, debugMessage: String = errorMessage)
+            : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
     }
 
     class Auth {
         class UnauthenticatedCallException
             : ApiException(HttpStatus.UNAUTHORIZED, "Unauthorized session for method", "")
         class NotEnoughPrivilegesException: ApiException {
-            constructor(sessionRole: UserRole, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method: Insufficient role", "Session role [${sessionRole.name}] not authorized for method $method")
+            constructor(sessionRole: UserRole?, endpoint: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges (insufficient role) at endpoint [$endpoint]", "Session role [${sessionRole?.name}] not authorized for endpoint [$endpoint]")
             constructor(permissionList: List<Permission>, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method: Insufficient permission", "Session permissions [${permissionList.toList()}] not authorized for method $method")
             constructor(errorMessage: String, debugMessage: String = errorMessage): super(HttpStatus.FORBIDDEN, errorMessage, debugMessage)
         }

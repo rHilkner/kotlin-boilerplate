@@ -28,7 +28,7 @@ class AppUserCreator {
     }
 
     fun createAppUserDto(): AppAdminDTO {
-        return AppAdminDTO(1, "John Silva", "john.silva@abcmail.com", UserRole.USER)
+        return AppAdminDTO(1, "John Silva", "john.silva@abcmail.com")
     }
 
 }

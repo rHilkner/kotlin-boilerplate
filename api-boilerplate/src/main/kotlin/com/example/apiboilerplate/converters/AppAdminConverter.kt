@@ -12,7 +12,7 @@ class AppAdminConverter {
     }
 
     fun appAdminToAppAdminDto(appAdmin: AppAdmin): AppAdminDTO {
-        return AppAdminDTO(appAdmin, UserRole.ADMIN)
+        return AppAdminDTO(appAdmin)
     }
 
 }

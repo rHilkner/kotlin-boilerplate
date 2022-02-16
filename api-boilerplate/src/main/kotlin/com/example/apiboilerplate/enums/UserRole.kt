@@ -8,11 +8,11 @@ enum class UserRole: PersistableEnum, DTOEnum {
 
     CUSTOMER {
         override var dbValue = "CUSTOMER"
-        override var dtoValue = "Customer"
+        override var dtoValue = "CUSTOMER"
     },
     ADMIN {
         override var dbValue = "ADMIN"
-        override var dtoValue = "Admin"
+        override var dtoValue = "ADMIN"
     };
 
     class Converter : DbEnumConverter<UserRole>(UserRole::class.java)

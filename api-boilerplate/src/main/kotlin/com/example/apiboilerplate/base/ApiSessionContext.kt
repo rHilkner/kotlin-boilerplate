@@ -21,7 +21,7 @@ class ApiSessionContext(
 ) {
 
     companion object {
-        private var EXECUTION_ID_KEY = "executionId"
+        private var TRANSACTION_ID_KEY = "transactionId"
         private val threadLocal = ThreadLocal<ApiSessionContext>()
 
         @Synchronized
@@ -31,12 +31,12 @@ class ApiSessionContext(
 
         fun clearApiCallContext() {
             threadLocal.remove();
-            MDC.remove(EXECUTION_ID_KEY)
+            MDC.remove(TRANSACTION_ID_KEY)
         }
     }
 
-    // Set request context unique execution id
-    var executionId: String = UUID.randomUUID().toString()
+    // Set request context unique transaction id
+    var transactionId: String = UUID.randomUUID().toString()
 
     var startDt: Date = Date()
     var endDt: Date? = null
@@ -60,8 +60,8 @@ class ApiSessionContext(
         }
 
     init {
-        MDC.remove(EXECUTION_ID_KEY)
-        MDC.put(EXECUTION_ID_KEY, this.executionId)
+        MDC.remove(TRANSACTION_ID_KEY)
+        MDC.put(TRANSACTION_ID_KEY, this.transactionId)
         threadLocal.set(this)
     }
 

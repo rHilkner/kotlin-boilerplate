@@ -3,6 +3,7 @@ package com.example.apiboilerplate.services.base
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.annotations.SecuredPermission
 import com.example.apiboilerplate.base.annotations.SecuredRole
+import com.example.apiboilerplate.base.interceptors.sys_call_log.AppHttpRequestWrapper
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.StatusCd
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.method.HandlerMethod
 import java.util.*
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletRequestWrapper
 
 @Service
 class AuthService(
@@ -51,8 +53,12 @@ class AuthService(
         return passwordEncoder.matches(password, encoded)
     }
 
-    fun createBlankApiSession(): ApiSession {
-        return ApiSession(getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress)
+    fun authenticate(appUser: AppUser, password: String): ApiSession {
+        log.info("Attempting to authenticate [${appUser.role} / ${appUser.email}] with password")
+        if (!passwordMatchesEncoded(password, appUser.passwordHash)) {
+            throw ApiExceptionModule.Auth.IncorrectPasswordException()
+        }
+        return createAndSaveApiSession(appUser)
     }
 
     fun createAndSaveApiSession(appUser: AppUser, permissions: List<Permission> = listOf(), renewExpiration: Boolean = true): ApiSession {
@@ -63,18 +69,14 @@ class AuthService(
         return apiSession
     }
 
-    fun authenticate(appUser: AppUser, password: String): ApiSession {
-        if (!passwordMatchesEncoded(password, appUser.passwordHash)) {
-            throw ApiExceptionModule.Auth.IncorrectPasswordException()
-        }
-        return createAndSaveApiSession(appUser)
-    }
-
     fun authenticate(request: HttpServletRequest): ApiSession {
         log.debug("Attempting to authenticate request: [{}]", request)
-
         val authToken = getAuthTokenFromRequest(request)
         return getApiSession(authToken)
+    }
+
+    fun createBlankApiSession(): ApiSession {
+        return ApiSession(getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress)
     }
 
     private fun getApiSession(token: String?): ApiSession {
@@ -118,44 +120,44 @@ class AuthService(
         return authorizationHeaderComponents[1]
     }
 
-    fun authorize(request: HttpServletRequest, apiSession: ApiSession, handler: Any) {
+    fun authorize(request: AppHttpRequestWrapper, apiSession: ApiSession, handler: Any) {
 
         // If it does not have a proper HandlerMethod let it continue and fail for NOT_FOUND.
         if (handler !is HandlerMethod) {
             return
         }
 
-        log.info("Authorizing request: [{}]", request.requestURI)
+        log.info("Authorizing request for endpoint [${request.wrapperEndpoint}]")
 
         val securedRoles = this.getSecuredRoles(handler)
         val securedPermissions = this.getSecuredPermissions(handler)
 
         if (securedRoles.isEmpty()) {
-            log.info("Request [{}] is not secured - authorizing request", request.requestURI)
+            log.info("Endpoint [${request.wrapperEndpoint}] is not secured - authorizing request")
             return
         }
 
         if (apiSession.statusCd != StatusCd.ACTIVE) {
-            log.warn("Attempting to access secured resource [{}] without authenticated session", request.requestURI)
+            log.error("Attempting to access secured endpoint [${request.wrapperEndpoint}] without authenticated session")
             throw ApiExceptionModule.Auth.UnauthenticatedCallException()
         }
 
         if (!securedRoles.contains(apiSession.role)) {
             // No role in session in secured group - don't authorize.
-            log.warn("No session roles authorized for request: [{}]", request.requestURI)
-            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.role, request.method)
+            log.error("No session roles authorized for endpoint [${request.wrapperEndpoint}]")
+            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.role, request.wrapperEndpoint)
         }
 
         // If there are permissions needed and session does not have permission needed, don't authorize
         if (securedPermissions.isNotEmpty() && !securedPermissions.any { p -> apiSession.permissions.contains(p) }) {
             // No role in session in secured group - don't authorize.
-            log.warn("No session permissions authorized for request: [{}]", request.requestURI)
-            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.permissions, request.method)
+            log.error("No session permissions authorized for endpoint [${request.wrapperEndpoint}]")
+            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.permissions, request.wrapperEndpoint)
 
         }
 
         // One of session's roles is in the secured role group - authorize.
-        log.debug("Session authorized for request: [{}]", request.requestURI)
+        log.info("Session authorized for endpoint [${request.wrapperEndpoint}]")
         return
     }
 

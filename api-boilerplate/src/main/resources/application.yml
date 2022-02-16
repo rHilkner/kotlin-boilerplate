@@ -57,8 +57,8 @@ spring:
 # Logger configuration
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{executionId}] %C{1} [%M] - %m%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{executionId}] %C{1} [%M] - %m%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{transactionId}] %C{1} [%M] - %m%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{transactionId}] %C{1} [%M] - %m%n"
   level:
     ROOT: warn
     web: info
@@ -95,7 +95,7 @@ boilerplate-env:
   authentication:
     should-session-expire: false
     session-expires-in: 1000000     # number of seconds session is valid for after last activity
-    session-token-length: 21
+    session-token-length: 72
 
 --- # DEBUG PROFILE
 

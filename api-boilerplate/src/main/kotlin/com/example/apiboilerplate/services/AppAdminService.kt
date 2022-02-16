@@ -2,6 +2,7 @@ package com.example.apiboilerplate.services
 
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
+import com.example.apiboilerplate.converters.ApiSessionConverter
 import com.example.apiboilerplate.converters.AppAdminConverter
 import com.example.apiboilerplate.dtos.AppAdminDTO
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
@@ -32,8 +33,7 @@ class AppAdminService(
     companion object { private val log by ApiLogger() }
 
     private val appAdminConverter = AppAdminConverter()
-
-    // Controller related functions
+    private val apiSessionConverter = ApiSessionConverter()
 
     fun login(loginRequestDTO: LoginRequestDTO): AuthAppAdminResponseDTO {
         log.info("Login in admin with email [${loginRequestDTO.email}]")
@@ -45,7 +45,8 @@ class AppAdminService(
         val apiSession = authService.authenticate(appAdmin, loginRequestDTO.password)
 
         // If no error was thrown, return response dto
-        return AuthAppAdminResponseDTO(apiSession.token, appAdminConverter.appAdminToAppAdminDto(appAdmin))
+        return AuthAppAdminResponseDTO(apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession),
+            appAdminConverter.appAdminToAppAdminDto(appAdmin))
     }
 
     fun signUp(adminSignUpRequestDTO: AdminSignUpRequestDTO): AuthAppAdminResponseDTO {
@@ -62,19 +63,19 @@ class AppAdminService(
         val passwordHash = authService.encodePassword(adminSignUpRequestDTO.password)
         var newAppAdmin = appAdminConverter.signUpDtoToAppAdmin(adminSignUpRequestDTO, passwordHash)
         newAppAdmin = appAdminRepository.save(newAppAdmin)
-
-        log.info("New admin was created with email [${adminSignUpRequestDTO.email}] and id [${newAppAdmin.adminId}]")
+        log.info("New admin was created with email [${newAppAdmin.email}] and id [${newAppAdmin.adminId}]")
 
         // Authenticate user
         val apiSession = authService.authenticate(newAppAdmin, adminSignUpRequestDTO.password)
-
-        log.info("New admin authenticated with email [${adminSignUpRequestDTO.email}] with token [${apiSession.token}]")
+        log.info("New admin authenticated with email [${newAppAdmin.email}] with token [${apiSession.token}]")
 
         // If no error was thrown, return response dto
-        return AuthAppAdminResponseDTO(apiSession.token, appAdminConverter.appAdminToAppAdminDto(newAppAdmin))
+        return AuthAppAdminResponseDTO(apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession),
+            appAdminConverter.appAdminToAppAdminDto(newAppAdmin))
     }
 
     fun forgotPassword(email: String) {
+        log.info("Admin [$email] forgot password")
         // Create new api-session with RESET_PASSWORD permission
         val appAdmin = appAdminRepository.findAppAdminByEmail(email)
             ?: throw ApiExceptionModule.User.UserNotFoundException(email)
@@ -146,7 +147,8 @@ class AppAdminService(
     }
 
     fun updateAdmin(newAppAdminDTO: AppAdminDTO): AppAdminDTO {
-        val currentAppAdmin = appAdminRepository.getById(newAppAdminDTO.adminId)
+        if (newAppAdminDTO.adminId == null) throw ApiExceptionModule.General.NullPointer("adminDTO.customerId")
+        val currentAppAdmin = appAdminRepository.getById(newAppAdminDTO.adminId!!)
         return updateAdmin(currentAppAdmin, newAppAdminDTO)
     }
 

@@ -1,21 +1,21 @@
 package com.example.apiboilerplate.dtos.auth
 
 import com.example.apiboilerplate.enums.StatusCd
+import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.base.ApiSession
+import com.example.apiboilerplate.utils.ObjectUtil
 import java.util.*
 
-class ApiPermissionResponseDTO(apiSession: ApiSession) {
+class ApiSessionResponseDTO(apiSession: ApiSession) {
 
-    private val token: String
-    private val startDt: Date
-    private val lastActivityDt: Date
-    private val statusCd: StatusCd
+    lateinit var token: String
+    lateinit var startDt: Date
+    lateinit var lastActivityDt: Date
+    lateinit var statusCd: StatusCd
+    lateinit var role: UserRole
 
     init {
-        this.token = apiSession.token
-        this.startDt = apiSession.startDt
-        this.lastActivityDt = apiSession.lastActivityDt
-        this.statusCd = apiSession.statusCd
+        ObjectUtil.copyProps(apiSession, this)
     }
 
 }

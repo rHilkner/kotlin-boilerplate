@@ -2,15 +2,16 @@
 
 ## Description
 
-This is a Kotlin API with only 3 endpoints: signup, login and forgot password. The first 2 are API based only and the 3rd involves an SMTP module that you can enable/disable in the config.yaml file.
+This is a Kotlin API with few endpoints, but a robust foundation. Out of the box, open source solution to start developing an API without having to waste time on logging/security setup.
 
 ## Database
 
 The database is based on Postgres and have the following tables
-- USER: user_id, name, email, password, user_role
+- ADMIN: admin_id, name, email, password_hash + soft delete
+- CUSTOMER: customer_id, name, email, password_hash, status_cd, last_access_dt, last_access_ip, phone, document_id, address, address_complement + soft delete 
 - SYS_API_LOG: api_log_id, src_ip, request_endpoint, request_url, request_headers, request_body, response_http_status, response_body
 - SYS_ERROR_LOG: error_log_id, api_log_id, error_backtrace, error_message
-- SYS_SMTP_LOG: smtp_log_id, api_log_id, from_email_addr, to_email_addr, email_subject, email_body
+- SYS_SMTP_LOG: smtp_log_id, api_log_id, from_addr, to_addr, subject, body, sent_status_cd
 - Audit columns: created_dt, created_by, updated_dt, updated_by
 - Soft-delete columns: deleted_status, deleted_dt, deleted_by
 
@@ -19,7 +20,8 @@ DDL at: ./database/ddl.sql
 ## Backend
 
 Architecture:
-- TO-DO
+- MVC with the following layers: Controller -> Service -> Repository
+- Interceptors for logging requests and errors to database
 
 FAQ:
 - Where to add a new ApiError? -> class ApiErrorModule
@@ -30,31 +32,40 @@ FAQ:
 
 Database setup
 - Install PostgreSLQ
-- Create local database named db_boilerplate
 - Run the ddl file at database/ddl.sql
 
 SMTP setup
-- To-do
+- Local: ./scripts/maildev_cheatsheet.sh
+- Cloud: developer must set SMTP server variables in application.yml file
+
+API Monitor setup
+- Start Prometheus and Grafana (./scripts/api_monitor_cheat_sheet.sh)
+- Access Grafana at localhost:9090
+- Import dashboard ID ? in Grafana
 
 Code setup
-- To-do
+- Set database, SMTP and API Monitor and you should have everything that this project uses
 
 ---
 
 ## Features
 
-DONE
+API features
 - Client API: login, sign-up, forgot_password
 - Admin API: login, sign-up, get users, edit users, delete users
 - Security: Encrypted password and API Session Token
-- Forgot password: Basic email sending and SMTP integration
-- Monitoring: Dashboard made with Spring Boot Actuator, Prometheus and Grafana
-- API log table: Any incoming request and response is saved to database (SYS_CALL_LOG)
-- Email log table: Every sent email is saved to database (SYS_EMAIL_LOG)
-- Error log table: Any incoming request that results in an exception as response is saved to database with exception class, description and stack-trace (SYS_ERROR_LOG)
 - Exception handling: All app exceptions are configured in one class (ApiExceptionModule)
 - Automatic enum conversion to API and Database (DbEnumConverter)
+- Forgot password: Basic email sending and SMTP integration
+- Monitoring: Dashboard made with Spring Boot Actuator, Prometheus and Grafana
+- Postman collection
 - Logs
+
+DB features
+- API Session table: Keeps tokens and permissions for users logged in
+- API call-log table: Any incoming request and response is saved to database (SYS_CALL_LOG)
+- Email log table: Every sent email is saved to database (SYS_EMAIL_LOG)
+- Error log table: Any incoming request that results in an exception as response is saved to database with exception class, description and stack-trace (SYS_ERROR_LOG)
 
 TO-DO
 - Unit Tests

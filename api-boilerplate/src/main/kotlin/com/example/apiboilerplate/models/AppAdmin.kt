@@ -15,7 +15,7 @@ class AppAdmin: AppUser {
 
     constructor()
     constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String) {
-        ObjectUtil.copyProps(this, adminSignUpRequestDTO)
+        ObjectUtil.copyProps(adminSignUpRequestDTO, this)
         this.passwordHash = passwordHash
     }
 

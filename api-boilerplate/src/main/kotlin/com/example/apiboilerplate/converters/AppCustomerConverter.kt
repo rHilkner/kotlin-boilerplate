@@ -6,8 +6,8 @@ import com.example.apiboilerplate.models.AppCustomer
 
 class AppCustomerConverter {
 
-    fun signUpDtoToAppCustomer(customerSignUpRequestDTO: CustomerSignUpRequestDTO): AppCustomer {
-        return AppCustomer(customerSignUpRequestDTO)
+    fun signUpDtoToAppCustomer(customerSignUpRequestDTO: CustomerSignUpRequestDTO, passwordHash: String): AppCustomer {
+        return AppCustomer(customerSignUpRequestDTO, passwordHash)
     }
 
     fun appCustomerToAppCustomerDto(appCustomer: AppCustomer): AppCustomerDTO {

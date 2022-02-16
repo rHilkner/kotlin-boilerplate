@@ -27,8 +27,9 @@ class AppCustomer: AppUser {
     var addressComplement: String? = null
 
     constructor()
-    constructor(customerSignUpRequestDTO: CustomerSignUpRequestDTO) {
-        ObjectUtil.copyProps(this, customerSignUpRequestDTO)
+    constructor(customerSignUpRequestDTO: CustomerSignUpRequestDTO, passwordHash: String) {
+        ObjectUtil.copyProps(customerSignUpRequestDTO, this)
+        this.passwordHash = passwordHash
     }
 
 }

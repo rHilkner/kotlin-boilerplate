@@ -26,7 +26,7 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
         val requestWrapper = AppHttpRequestWrapper(request as HttpServletRequest)
         val responseWrapper = AppHttpResponseWrapper(response as HttpServletResponse)
         val apiSessionContext = ApiSessionContext(requestWrapper, responseWrapper)
-        log.info("Start api-call-context with executionId [{}]", apiSessionContext.executionId)
+        log.info("Start apiSessionContext to endpoint [${requestWrapper.wrapperEndpoint}] with transactionId [${apiSessionContext.transactionId}]")
         sysCallLogService.saveContextToSysCallLog(apiSessionContext)
 
         try {
@@ -36,10 +36,10 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
         } finally {
             // Save api-session to database and clear context
             apiSessionContext.endDt = Date()
-            val executionId = apiSessionContext.executionId
+            val transactionId = apiSessionContext.transactionId
             sysCallLogService.saveContextToSysCallLog(apiSessionContext)
             ApiSessionContext.clearApiCallContext()
-            log.info("Finish api-call-context with executionId [{}]", executionId)
+            log.info("Finish api-call-context with transactionId [{}]", transactionId)
         }
 
     }
