@@ -2,7 +2,6 @@ package com.example.apiboilerplate.converters
 
 import com.example.apiboilerplate.dtos.AppAdminDTO
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
-import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.AppAdmin
 
 class AppAdminConverter {
