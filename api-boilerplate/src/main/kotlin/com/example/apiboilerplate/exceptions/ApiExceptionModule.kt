@@ -1,5 +1,6 @@
 package com.example.apiboilerplate.exceptions
 
+import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import org.springframework.http.HttpStatus
 
@@ -14,7 +15,8 @@ class ApiExceptionModule {
         class UnauthenticatedCallException
             : ApiException(HttpStatus.UNAUTHORIZED, "Unauthorized session for method", "")
         class NotEnoughPrivilegesException: ApiException {
-            constructor(sessionRole: UserRole, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method", "Session roles ${sessionRole.name} not authorized for method $method")
+            constructor(sessionRole: UserRole, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method: Insufficient role", "Session role [${sessionRole.name}] not authorized for method $method")
+            constructor(permissionList: List<Permission>, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method: Insufficient permission", "Session permissions [${permissionList.toList()}] not authorized for method $method")
             constructor(errorMessage: String, debugMessage: String = errorMessage): super(HttpStatus.FORBIDDEN, errorMessage, debugMessage)
         }
         class IncorrectPasswordException

@@ -3,15 +3,12 @@ package com.example.apiboilerplate.enums
 import com.example.apiboilerplate.enums.converters.DbEnumConverter
 import com.example.apiboilerplate.enums.converters.PersistableEnum
 
-enum class UserRolesStatusCd: PersistableEnum {
+enum class Permission: PersistableEnum {
 
-    ACTIVE {
+    RESET_PASSWORD {
         override var dbValue = "A"
-    },
-    INACTIVE {
-        override var dbValue = "I"
     };
 
-    class Converter : DbEnumConverter<UserRolesStatusCd>(UserRolesStatusCd::class.java)
+    class Converter : DbEnumConverter<Permission>(Permission::class.java)
 
 }

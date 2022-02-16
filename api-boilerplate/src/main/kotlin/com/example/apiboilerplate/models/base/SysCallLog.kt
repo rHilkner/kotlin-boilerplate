@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.models.base
 
-import com.example.apiboilerplate.base.ApiCallContext
+import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.utils.JsonUtils
@@ -58,30 +58,30 @@ class SysCallLog() : DbAuditable() {
     @Column(name = "end_dt")
     var endDt: Date? = null
 
-    constructor(apiCallContext: ApiCallContext) : this() {
-        updateData(apiCallContext)
+    constructor(apiSessionContext: ApiSessionContext) : this() {
+        updateData(apiSessionContext)
     }
 
-    fun updateData(apiCallContext: ApiCallContext) {
+    fun updateData(apiSessionContext: ApiSessionContext) {
 
-        this.executionId = apiCallContext.executionId
+        this.executionId = apiSessionContext.executionId
 
-        this.url = apiCallContext.request.wrapperUrl
-        this.ip = apiCallContext.request.wrapperIpAddress
-        this.method = apiCallContext.request.wrapperMethod
-        this.endpoint = apiCallContext.request.wrapperEndpoint
-        this.parameters = apiCallContext.request.wrapperParameters
-        this.requestHeaders = apiCallContext.request.wrapperHeaders
+        this.url = apiSessionContext.request.wrapperUrl
+        this.ip = apiSessionContext.request.wrapperIpAddress
+        this.method = apiSessionContext.request.wrapperMethod
+        this.endpoint = apiSessionContext.request.wrapperEndpoint
+        this.parameters = apiSessionContext.request.wrapperParameters
+        this.requestHeaders = apiSessionContext.request.wrapperHeaders
         this.requestBody =
-            apiCallContext.request.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(apiCallContext.request.wrapperEndpoint, it, true) }
+            apiSessionContext.request.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(apiSessionContext.request.wrapperEndpoint, it, true) }
 
-        this.httpStatus = apiCallContext.response.wrapperHttpStatus
-        this.responseHeaders = apiCallContext.response.wrapperHeaders
+        this.httpStatus = apiSessionContext.response.wrapperHttpStatus
+        this.responseHeaders = apiSessionContext.response.wrapperHeaders
         this.responseBody =
-            apiCallContext.response.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(apiCallContext.request.wrapperEndpoint, it, false) }
+            apiSessionContext.response.wrapperBody?.let { extractBodyWithSensitiveInfoBlurred(apiSessionContext.request.wrapperEndpoint, it, false) }
 
-        this.startDt = apiCallContext.startDt
-        this.endDt = apiCallContext.endDt
+        this.startDt = apiSessionContext.startDt
+        this.endDt = apiSessionContext.endDt
         this.updatedDt = Date()
     }
 

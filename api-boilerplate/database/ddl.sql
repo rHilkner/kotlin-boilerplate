@@ -32,6 +32,8 @@ create table app_admin (
     updated_by text not null
 );
 
+create unique index ux_admin_1 on app_admin (email);
+
 create table app_customer (
     -- User common columns
     customer_id serial constraint pk_customer primary key,
@@ -57,18 +59,23 @@ create table app_customer (
     updated_by text not null
 );
 
-create unique index ux_user_1 on app_customer (email);
+create unique index ux_customer_1 on app_customer (email);
 
 create table api_session (
     session_id serial constraint pk_api_session primary key,
     user_id numeric not null,
-    roles text not null,
+    role text not null,
+    permissions text not null,
     token text not null,
-    ip_address text not null,
+    ip_address text,
     status_cd text not null,
     start_dt timestamp not null,
-    last_activity_dt timestamp not null
+    last_activity_dt timestamp not null,
+    expires_in numeric,
+    renew_expiration boolean not null
 );
+
+create index ix_customer_1 on api_session (token);
 
 create table sys_call_log (
 	call_log_id serial constraint pk_api_log primary key,

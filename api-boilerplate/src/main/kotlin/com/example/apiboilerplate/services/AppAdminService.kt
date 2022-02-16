@@ -1,5 +1,6 @@
 package com.example.apiboilerplate.services
 
+import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.controllers.SendEmailRequest
 import com.example.apiboilerplate.converters.AppAdminConverter
@@ -7,6 +8,9 @@ import com.example.apiboilerplate.dtos.AppAdminDTO
 import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
 import com.example.apiboilerplate.dtos.auth.AuthAppAdminResponseDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
+import com.example.apiboilerplate.dtos.auth.ResetPasswordRequest
+import com.example.apiboilerplate.enums.Permission
+import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
@@ -71,9 +75,57 @@ class AppAdminService(
         return AuthAppAdminResponseDTO(apiSession.token, appAdminConverter.appAdminToAppAdminDto(newAppAdmin))
     }
 
+    fun forgotPassword(email: String) {
+        // TODO: create new api-session with RESET_PASSWORD permission
+        // TODO: send to user's email URL to reset password
+        // TODO: this URL must contain token from api-session created above
+        // example url: ${domain}/admin/reset_password?sessionToken=ABLUBLUBLE123
+        val appAdmin = appAdminRepository.findAppAdminByEmail(email)
+            ?: throw ApiExceptionModule.User.UserNotFoundException(email)
+        val apiSession = authService.createAndSaveApiSession(appAdmin, listOf(Permission.RESET_PASSWORD), false)
+        emailService.send(email, "To change password use session-token: " + apiSession.token)
+    }
+
+    fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
+        val currentAppAdmin = getCurrentAdmin()
+
+        // Check if old-password matches current password
+        if (!authService.passwordMatchesEncoded(resetPasswordRequest.oldPassword, currentAppAdmin.passwordHash)) {
+            throw ApiExceptionModule.Auth.IncorrectPasswordException()
+        }
+
+        log.info("Changing admin password with email [${currentAppAdmin.email}]")
+        currentAppAdmin.passwordHash = authService.encodePassword(resetPasswordRequest.newPassword)
+        appAdminRepository.save(currentAppAdmin)
+        log.debug("Changed admin password with email [${currentAppAdmin.email}]")
+    }
+
+    fun forceResetPassword(newPassword: String) {
+
+        // Double check if current session has ResetPassword permission - this was probably checked at controller level as well
+        val currentPermissions = ApiSessionContext.getCurrentApiCallContext().apiSession!!.permissions
+        if (currentPermissions.contains(Permission.RESET_PASSWORD)) {
+            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(currentPermissions, ApiSessionContext.getCurrentApiCallContext().request.method)
+        }
+
+        // Change password for user of current session
+        val currentAppAdmin = getCurrentAdmin()
+        log.info("Changing admin password with email [${currentAppAdmin.email}]")
+        currentAppAdmin.passwordHash = authService.encodePassword(newPassword)
+        appAdminRepository.save(currentAppAdmin)
+        log.debug("Changed admin password with email [${currentAppAdmin.email}]")
+
+        // Inactivate current session after successful password reset
+        authService.inactivateCurrentSession()
+    }
+
+    fun getCurrentAdmin(): AppAdmin {
+        return appUserService.getCurrentUserFromDb() as AppAdmin
+    }
+
     fun getCurrentAdminDto(): AppAdminDTO {
         log.debug("Getting admin for current session")
-        return appAdminConverter.appAdminToAppAdminDto(appUserService.getCurrentUserFromDb() as AppAdmin)
+        return appAdminConverter.appAdminToAppAdminDto(getCurrentAdmin())
     }
 
     fun getAdminDtoByEmail(email: String): AppAdminDTO? {

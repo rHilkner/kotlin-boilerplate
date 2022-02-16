@@ -1,8 +1,10 @@
 package com.example.apiboilerplate.services.base
 
-import com.example.apiboilerplate.base.ApiCallContext
-import com.example.apiboilerplate.base.interceptors.security.Secured
+import com.example.apiboilerplate.base.ApiSessionContext
+import com.example.apiboilerplate.base.annotations.SecuredPermission
+import com.example.apiboilerplate.base.annotations.SecuredRole
 import com.example.apiboilerplate.base.logger.ApiLogger
+import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
@@ -31,7 +33,7 @@ class AuthService(
     private val AUTHENTICATION_SCHEME = "Bearer"
 
     @Value("\${boilerplate-env.authentication.should-session-expire}")
-    private val shouldSessionExpire = false
+    private val shouldSessionExpire = true
 
     @Value("\${boilerplate-env.authentication.session-expires-in}")
     private val sessionExpiresIn = 0L
@@ -50,13 +52,13 @@ class AuthService(
     }
 
     fun createBlankApiSession(): ApiSession {
-        return ApiSession(getNewSessionToken(), ApiCallContext.getCurrentApiCallContext().request.wrapperIpAddress)
+        return ApiSession(getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress)
     }
 
-    private fun createAndSaveApiSession(appUser: AppUser): ApiSession {
-        val newApiSession = ApiSession(appUser, getNewSessionToken(), ApiCallContext.getCurrentApiCallContext().request.wrapperIpAddress)
+    fun createAndSaveApiSession(appUser: AppUser, permissions: List<Permission> = listOf(), renewExpiration: Boolean = true): ApiSession {
+        val newApiSession = ApiSession(appUser, permissions, getNewSessionToken(), ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress, renewExpiration)
         val apiSession = apiSessionRepository.save(newApiSession)
-        ApiCallContext.getCurrentApiCallContext().apiSession = apiSession
+        ApiSessionContext.getCurrentApiCallContext().apiSession = apiSession
         return apiSession
     }
 
@@ -125,6 +127,7 @@ class AuthService(
         log.info("Authorizing request: [{}]", request.requestURI)
 
         val securedRoles = this.getSecuredRoles(handler)
+        val securedPermissions = this.getSecuredPermissions(handler)
 
         if (securedRoles.isEmpty()) {
             log.info("Request [{}] is not secured - authorizing request", request.requestURI)
@@ -142,6 +145,14 @@ class AuthService(
             throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.role, request.method)
         }
 
+        // If there are permissions needed and session does not have permission needed, don't authorize
+        if (securedPermissions.isNotEmpty() && !securedPermissions.any { p -> apiSession.permissions.contains(p) }) {
+            // No role in session in secured group - don't authorize.
+            log.warn("No session permissions authorized for request: [{}]", request.requestURI)
+            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(apiSession.permissions, request.method)
+
+        }
+
         // One of session's roles is in the secured role group - authorize.
         log.debug("Session authorized for request: [{}]", request.requestURI)
         return
@@ -157,20 +168,46 @@ class AuthService(
      * @return list of secured roles for a HandlerMethod, or null if neither the method or the class are annotated.
      */
     private fun getSecuredRoles(handlerMethod: HandlerMethod): List<UserRole> {
-        var secured: Secured? = null
+        var securedRole: SecuredRole? = null
 
         // Getting the Secured annotation from the method, if method is annotated.
-        if (handlerMethod.method.isAnnotationPresent(Secured::class.java)) {
-            secured = handlerMethod.method.getAnnotation(Secured::class.java)
+        if (handlerMethod.method.isAnnotationPresent(SecuredRole::class.java)) {
+            securedRole = handlerMethod.method.getAnnotation(SecuredRole::class.java)
         }
 
         // If method was not annotated, gets annotation from class.
-        if (secured == null && handlerMethod.beanType.isAnnotationPresent(Secured::class.java)) {
-            secured = handlerMethod.beanType.getAnnotation(Secured::class.java)
+        if (securedRole == null && handlerMethod.beanType.isAnnotationPresent(SecuredRole::class.java)) {
+            securedRole = handlerMethod.beanType.getAnnotation(SecuredRole::class.java)
         }
 
         // Return the list
-        return secured?.value?.toList() ?: listOf()
+        return securedRole?.value?.toList() ?: listOf()
+    }
+
+    /**
+     * Returns secured roles for a given request handlerMethod.
+     *
+     * Looks first for the annotation on the HandlerMethod method. If not annotated,
+     * looks for the annotation on the class.
+     *
+     * @param handlerMethod the request HandlerMethod
+     * @return list of secured roles for a HandlerMethod, or null if neither the method or the class are annotated.
+     */
+    private fun getSecuredPermissions(handlerMethod: HandlerMethod): List<Permission> {
+        var securedPermission: SecuredPermission? = null
+
+        // Getting the Secured annotation from the method, if method is annotated.
+        if (handlerMethod.method.isAnnotationPresent(SecuredPermission::class.java)) {
+            securedPermission = handlerMethod.method.getAnnotation(SecuredPermission::class.java)
+        }
+
+        // If method was not annotated, gets annotation from class.
+        if (securedPermission == null && handlerMethod.beanType.isAnnotationPresent(SecuredPermission::class.java)) {
+            securedPermission = handlerMethod.beanType.getAnnotation(SecuredPermission::class.java)
+        }
+
+        // Return the list
+        return securedPermission?.value?.toList() ?: listOf()
     }
 
     /**
@@ -181,6 +218,14 @@ class AuthService(
      */
     fun getNewSessionToken(): String {
         return this.randomString.nextString()
+    }
+
+    fun inactivateCurrentSession() {
+        val currentSession = ApiSessionContext.getCurrentApiCallContext().apiSession!!
+        log.info("Inactivating session with id [${currentSession.sessionId}]")
+        currentSession.statusCd = StatusCd.INACTIVE
+        apiSessionRepository.save(currentSession)
+        log.debug("Session with id [${currentSession.sessionId}] inactivated")
     }
 
 }

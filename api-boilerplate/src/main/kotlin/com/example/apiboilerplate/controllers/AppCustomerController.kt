@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.controllers
 
-import com.example.apiboilerplate.base.interceptors.security.Secured
+import com.example.apiboilerplate.base.annotations.SecuredRole
 import com.example.apiboilerplate.dtos.AppCustomerDTO
 import com.example.apiboilerplate.dtos.auth.AuthAppCustomerResponseDTO
 import com.example.apiboilerplate.dtos.auth.CustomerSignUpRequestDTO
@@ -28,13 +28,13 @@ class AppCustomerController(
         return response(appCustomerService.signUp(customerSignUpRequestDTO), HttpStatus.OK)
     }
 
-    @Secured([UserRole.CUSTOMER])
+    @SecuredRole([UserRole.CUSTOMER])
     @GetMapping("/get_current_user")
     fun getCurrentUser(): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
         return response(appCustomerService.getCurrentCustomerDto(), HttpStatus.OK)
     }
 
-    @Secured([UserRole.CUSTOMER])
+    @SecuredRole([UserRole.CUSTOMER])
     @PostMapping("/update_current_user")
     fun updateCurrentUser(@RequestBody newAppCustomerDTO: AppCustomerDTO): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
         return response(appCustomerService.updateCurrentCustomer(newAppCustomerDTO), HttpStatus.OK)

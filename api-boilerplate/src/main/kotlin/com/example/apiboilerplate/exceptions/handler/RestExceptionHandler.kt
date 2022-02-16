@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.exceptions.handler
 
-import com.example.apiboilerplate.base.ApiCallContext
-import com.example.apiboilerplate.base.logger.log
+import com.example.apiboilerplate.base.ApiSessionContext
+import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.exception.ApiErrorDTO
 import com.example.apiboilerplate.exceptions.ApiException
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
@@ -16,6 +16,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 class RestExceptionHandler(private val errorLogService: ErrorLogService) : ResponseEntityExceptionHandler() {
+
+    companion object { private val log by ApiLogger() }
 
     @ExceptionHandler(Exception::class)
     protected fun handleUnexpectedError(ex: Exception): ResponseEntity<ApiErrorDTO> {
@@ -36,7 +38,7 @@ class RestExceptionHandler(private val errorLogService: ErrorLogService) : Respo
         val responseEntity = ResponseEntity(apiErrorDTO, apiException.httpStatus)
 
         // Set context variables and save context to database table SYS_ERROR_LOG
-        ApiCallContext.getCurrentApiCallContext().apiException = apiException
+        ApiSessionContext.getCurrentApiCallContext().apiException = apiException
         errorLogService.saveApiExceptionToSysErrorLog(apiException)
 
         log.debug("Exception successfully saved to database, responding API")

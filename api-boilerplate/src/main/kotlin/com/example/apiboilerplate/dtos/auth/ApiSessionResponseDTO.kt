@@ -4,7 +4,7 @@ import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.models.base.ApiSession
 import java.util.*
 
-class ApiSessionResponseDTO(apiSession: ApiSession) {
+class ApiPermissionResponseDTO(apiSession: ApiSession) {
 
     private val token: String
     private val startDt: Date

@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.base.interceptors.sys_call_log
 
-import com.example.apiboilerplate.base.ApiCallContext
+import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.services.base.SysCallLogService
 import org.springframework.stereotype.Component
@@ -25,9 +25,9 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
         // Instantiate wrappers for request and response objects to be able to read data
         val requestWrapper = AppHttpRequestWrapper(request as HttpServletRequest)
         val responseWrapper = AppHttpResponseWrapper(response as HttpServletResponse)
-        val apiCallContext = ApiCallContext(requestWrapper, responseWrapper)
-        log.info("Start api-call-context with executionId [{}]", apiCallContext.executionId)
-        sysCallLogService.saveContextToSysCallLog(apiCallContext)
+        val apiSessionContext = ApiSessionContext(requestWrapper, responseWrapper)
+        log.info("Start api-call-context with executionId [{}]", apiSessionContext.executionId)
+        sysCallLogService.saveContextToSysCallLog(apiSessionContext)
 
         try {
             // Execute request
@@ -35,10 +35,10 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
             responseWrapper.flushBuffer()
         } finally {
             // Save api-session to database and clear context
-            apiCallContext.endDt = Date()
-            val executionId = apiCallContext.executionId
-            sysCallLogService.saveContextToSysCallLog(apiCallContext)
-            ApiCallContext.clearApiCallContext()
+            apiSessionContext.endDt = Date()
+            val executionId = apiSessionContext.executionId
+            sysCallLogService.saveContextToSysCallLog(apiSessionContext)
+            ApiSessionContext.clearApiCallContext()
             log.info("Finish api-call-context with executionId [{}]", executionId)
         }
 

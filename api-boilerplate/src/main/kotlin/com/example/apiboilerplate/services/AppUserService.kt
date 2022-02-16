@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.services
 
-import com.example.apiboilerplate.base.ApiCallContext
+import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
@@ -22,11 +22,15 @@ class AppUserService(
 
     fun getCurrentUserFromDb(cached: Boolean = false): AppUser? {
 
+        if (cached && ApiSessionContext.getCurrentApiCallContext().currentUser != null) {
+            return ApiSessionContext.getCurrentApiCallContext().currentUser
+        }
+
         log.debug("Selecting current session's user from database")
 
         // Check if there is a current user
-        val userId = ApiCallContext.getCurrentApiCallContext().currentUserId ?: return null
-        val userRole = ApiCallContext.getCurrentApiCallContext().currentUserRole
+        val userId = ApiSessionContext.getCurrentApiCallContext().currentUserId ?: return null
+        val userRole = ApiSessionContext.getCurrentApiCallContext().currentUserRole
             ?: throw ApiExceptionModule.General.UnexpectedException("User role not found")
 
         // Get user from database
@@ -37,7 +41,7 @@ class AppUserService(
 
         // Update user
         val appUserUpdated = updateLastActivityDt(appUser)
-        ApiCallContext.getCurrentApiCallContext().currentUser = appUserUpdated
+        ApiSessionContext.getCurrentApiCallContext().currentUser = appUserUpdated
 
         log.debug("Current session's user with id [${appUserUpdated.userId}] selected from database")
 

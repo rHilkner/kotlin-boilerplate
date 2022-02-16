@@ -1,6 +1,6 @@
-package com.example.apiboilerplate.base.interceptors.security
+package com.example.apiboilerplate.base.annotations
 
-import com.example.apiboilerplate.enums.UserRole
+import com.example.apiboilerplate.enums.Permission
 
 @kotlin.annotation.Retention(AnnotationRetention.RUNTIME)
 @Target(
@@ -10,4 +10,4 @@ import com.example.apiboilerplate.enums.UserRole
     AnnotationTarget.PROPERTY_GETTER,
     AnnotationTarget.PROPERTY_SETTER
 )
-annotation class Secured(val value: Array<UserRole>)
+annotation class SecuredPermission(val value: Array<Permission>)

@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.services.base
 
-import com.example.apiboilerplate.base.ApiCallContext
+import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.exceptions.ApiException
 import com.example.apiboilerplate.models.base.SysErrorLog
 import com.example.apiboilerplate.repositories.SysErrorLogRepository
@@ -12,7 +12,7 @@ class ErrorLogService(private val sysErrorLogRepository: SysErrorLogRepository) 
     fun saveApiExceptionToSysErrorLog(apiException: ApiException) {
 
         val sysErrorLog = SysErrorLog(
-            ApiCallContext.getCurrentApiCallContext().sysCallLog.callLogId,
+            ApiSessionContext.getCurrentApiCallContext().sysCallLog.callLogId,
             apiException.httpStatus.name,
             apiException.httpStatus.value().toString(),
             apiException.javaClass.name,

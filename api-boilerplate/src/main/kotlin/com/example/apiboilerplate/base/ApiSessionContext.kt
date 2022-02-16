@@ -15,17 +15,17 @@ import java.util.*
  * across business method calls. It contains diagnostic information about the call (request and response), most
  * importantly a unique transaction ID which can be user to track this service invocation.
  */
-class ApiCallContext(
+class ApiSessionContext(
     var request: AppHttpRequestWrapper,
     var response: AppHttpResponseWrapper
 ) {
 
     companion object {
         private var EXECUTION_ID_KEY = "executionId"
-        private val threadLocal = ThreadLocal<ApiCallContext>()
+        private val threadLocal = ThreadLocal<ApiSessionContext>()
 
         @Synchronized
-        fun getCurrentApiCallContext(): ApiCallContext {
+        fun getCurrentApiCallContext(): ApiSessionContext {
             return threadLocal.get()
         }
 

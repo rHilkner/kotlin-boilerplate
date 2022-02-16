@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.services.email
 
-import com.example.apiboilerplate.base.logger.log
+import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.mail.javamail.MimeMessageHelper
@@ -10,6 +10,8 @@ import javax.mail.MessagingException
 
 @Service
 class EmailService(private val mailSender: JavaMailSender) : EmailSender {
+
+    companion object { private val log by ApiLogger() }
 
     @Async
     override fun send(to: String, text: String) {

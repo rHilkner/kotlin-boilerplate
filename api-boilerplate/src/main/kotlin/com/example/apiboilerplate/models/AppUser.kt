@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.models
 
-import com.example.apiboilerplate.base.ApiCallContext
+import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.base.DbSoftDelete
@@ -63,7 +63,7 @@ abstract class AppUser: DbSoftDelete {
         this.email = email
         this.name = name
         this.passwordHash = password
-        this.lastAccessIp = ApiCallContext.getCurrentApiCallContext().request.wrapperIpAddress
+        this.lastAccessIp = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
     }
 
 }
