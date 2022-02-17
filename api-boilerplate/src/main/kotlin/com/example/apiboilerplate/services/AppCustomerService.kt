@@ -10,16 +10,16 @@ import com.example.apiboilerplate.dtos.auth.CustomerSignUpRequestDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
 import com.example.apiboilerplate.dtos.auth.ResetPasswordRequest
 import com.example.apiboilerplate.enums.AppEmails
+import com.example.apiboilerplate.enums.AppPaths
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.repositories.AppCustomerRepository
-import com.example.apiboilerplate.services.base.ApiSessionService
-import com.example.apiboilerplate.services.base.AuthService
-import com.example.apiboilerplate.services.base.EmailService
-import com.example.apiboilerplate.services.base.SecurityService
+import com.example.apiboilerplate.services.base.*
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class AppCustomerService(
@@ -29,7 +29,8 @@ class AppCustomerService(
     private val apiSessionService: ApiSessionService,
     private val appUserService: AppUserService,
     private val emailService: EmailService,
-    private val securityService: SecurityService
+    private val securityService: SecurityService,
+    private val storageService: StorageService
 ) {
 
     companion object { private val log by ApiLogger() }

@@ -11,6 +11,8 @@ class ApiExceptionModule {
             : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
         class NullPointer(errorMessage: String, debugMessage: String = errorMessage)
             : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
+        class BadRequestException(errorMessage: String, debugMessage: String = errorMessage)
+            : ApiException(HttpStatus.BAD_REQUEST, errorMessage, debugMessage)
     }
 
     class Auth {

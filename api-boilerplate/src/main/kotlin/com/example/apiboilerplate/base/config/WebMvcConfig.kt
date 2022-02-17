@@ -3,17 +3,29 @@ package com.example.apiboilerplate.base.config
 import com.example.apiboilerplate.base.interceptors.security.AuthInterceptor
 import com.example.apiboilerplate.base.interceptors.sys_call_log.ApiCallContextFilter
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebMvcConfig : WebMvcConfigurer {
+class WebMvcConfig(var authInterceptor: AuthInterceptor) : WebMvcConfigurer {
 
-    @Autowired
-    private lateinit var authInterceptor: AuthInterceptor
+    @Value("\${boilerplate-env.server.allowed_origins}")
+    private lateinit var allowedOrigins: List<String>
+
+    override fun addInterceptors(registry: InterceptorRegistry) {
+        super.addInterceptors(registry)
+        registry.addInterceptor(authInterceptor)
+    }
+
+    override fun addCorsMappings(registry: CorsRegistry) {
+        super.addCorsMappings(registry)
+        registry.addMapping("/**").allowedOrigins(*this.allowedOrigins.map { it }.toTypedArray())
+    }
 
     @Bean
     fun createLoggers(apiCallContextFilter: ApiCallContextFilter): FilterRegistrationBean<ApiCallContextFilter> {
@@ -22,11 +34,6 @@ class WebMvcConfig : WebMvcConfigurer {
         // Uncomment below to select specific endpoints to be logged to database table SYS_CALL_LOG
         // registrationBean.addUrlPatterns("/sign_up", "/get_user")
         return registrationBean
-    }
-
-    override fun addInterceptors(registry: InterceptorRegistry) {
-        super.addInterceptors(registry)
-        registry.addInterceptor(authInterceptor)
     }
 
 }

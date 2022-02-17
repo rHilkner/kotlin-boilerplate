@@ -8,16 +8,20 @@ import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.AppCustomerService
+import com.example.apiboilerplate.services.AppUserService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import javax.transaction.Transactional
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/customer")
 class AppCustomerController(
-    private val appCustomerService: AppCustomerService
+    private val appCustomerService: AppCustomerService,
+    private val appUserService: AppUserService
 ): AbstractController() {
 
     // AUTH ENDPOINTS
@@ -96,6 +100,17 @@ class AppCustomerController(
     @Transactional
     fun deleteCustomer(@RequestParam customerId: Long): ResponseEntity<ResponsePayload<Any?>> {
         return response(appCustomerService.deleteCustomer(customerId), HttpStatus.OK)
+    }
+
+    @SecuredRole([UserRole.CUSTOMER])
+    @PostMapping(
+        path = ["/upload_profile_image"],
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    @Transactional
+    fun uploadProfileImage(@RequestParam file: MultipartFile): ResponseEntity<ResponsePayload<Any?>> {
+        return response(appUserService.uploadProfileImage(file), HttpStatus.OK)
     }
 
 }

@@ -31,6 +31,9 @@ abstract class AppUser: DbSoftDelete {
     @Column(name = "name")
     lateinit var name: String
 
+    @Column(name = "profile_image_path")
+    var profileImagePath: String? = null
+
     @Column(name = "password_hash")
     lateinit var passwordHash: String
 

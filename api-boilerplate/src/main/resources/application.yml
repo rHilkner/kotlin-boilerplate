@@ -33,6 +33,9 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false # https://stackoverflow.com/questions/30549489/what-is-this-spring-jpa-open-in-view-true-property-in-spring-boot
     generate-ddl: false
+  servlet:
+    multipart:
+      max-file-size: 50MB
   # Date properties
   jackson:
     serialization:
@@ -91,11 +94,16 @@ management:
 boilerplate-env:
   server:
     domain: boilerplate.com
+    # Add origins that will be allowed on CORS mapping (separated by comma)
+    allowed-origins: http://localhost:8080
   # Authentication related
   authentication:
     should-session-expire: false
     session-expires-in: 1000000     # number of seconds session is valid for after last activity
     session-token-length: 72
+  paths:
+    admin-profile-images: ./storage/admin_profile_images/
+    customer-profile-images: ./storage/customer_profile_images/
 
 --- # DEBUG PROFILE
 

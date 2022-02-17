@@ -30,9 +30,7 @@ class MonitorConfig {
     }
 
     @Bean
-    fun configurer(
-        @Value("\${spring.application.name}") applicationName: String?
-    ): MeterRegistryCustomizer<MeterRegistry>? {
+    fun configurer(@Value("\${spring.application.name}") applicationName: String?): MeterRegistryCustomizer<MeterRegistry>? {
         return MeterRegistryCustomizer { registry: MeterRegistry ->
             registry.config().commonTags("application", applicationName)
         }
