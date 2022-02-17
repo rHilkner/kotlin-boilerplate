@@ -1,6 +1,5 @@
 package com.example.apiboilerplate.services
 
-import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.converters.ApiSessionConverter
 import com.example.apiboilerplate.converters.AppCustomerConverter
@@ -8,18 +7,12 @@ import com.example.apiboilerplate.dtos.AppCustomerDTO
 import com.example.apiboilerplate.dtos.auth.AuthAppCustomerResponseDTO
 import com.example.apiboilerplate.dtos.auth.CustomerSignUpRequestDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
-import com.example.apiboilerplate.dtos.auth.ResetPasswordRequest
-import com.example.apiboilerplate.enums.AppEmails
-import com.example.apiboilerplate.enums.AppPaths
-import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.repositories.AppCustomerRepository
 import com.example.apiboilerplate.services.base.*
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class AppCustomerService(
@@ -75,57 +68,6 @@ class AppCustomerService(
         // If no error was thrown, return response dto
         return AuthAppCustomerResponseDTO(apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession),
             appCustomerConverter.appCustomerToAppCustomerDto(newAppCustomer))
-    }
-
-    fun forgotPassword(email: String) {
-        log.info("Customer [$email] forgot password")
-
-        // Get user from repository
-        val appCustomer = appCustomerRepository.findAppCustomerByEmail(email)
-            ?: throw ApiExceptionModule.User.UserNotFoundException(email)
-
-        // Create new api-session with RESET_PASSWORD permission
-        val sessionToken = authService.generateNewSessionToken()
-        val apiSession = apiSessionService.createAndSaveApiSession(appCustomer, sessionToken, listOf(Permission.RESET_PASSWORD), false)
-
-        // Send to user's email session token to reset password
-        emailService.send(AppEmails.ADMIN, email, "Forgot password",
-            "To change password use session-token: " + apiSession.token)
-
-        log.debug("Sent email to recover password to user [${appCustomer.role} / ${appCustomer.email}]")
-    }
-
-    fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
-        val currentAppCustomer = getCurrentCustomer()
-
-        // Check if old-password matches current password
-        if (!authService.passwordMatchesEncoded(resetPasswordRequest.oldPassword, currentAppCustomer.passwordHash)) {
-            throw ApiExceptionModule.Auth.IncorrectPasswordException()
-        }
-
-        log.info("Changing admin password with email [${currentAppCustomer.email}]")
-        currentAppCustomer.passwordHash = authService.encodePassword(resetPasswordRequest.newPassword)
-        appCustomerRepository.save(currentAppCustomer)
-        log.debug("Changed admin password with email [${currentAppCustomer.email}]")
-    }
-
-    fun forceResetPassword(newPassword: String) {
-
-        // Double check if current session has ResetPassword permission - this was probably checked at controller level as well
-        val currentPermissions = ApiSessionContext.getCurrentApiCallContext().apiSession!!.permissions
-        if (!currentPermissions.contains(Permission.RESET_PASSWORD)) {
-            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(currentPermissions, ApiSessionContext.getCurrentApiCallContext().request.method)
-        }
-
-        // Change password for user of current session
-        val currentAppAdmin = getCurrentCustomer()
-        log.info("Changing admin password with email [${currentAppAdmin.email}]")
-        currentAppAdmin.passwordHash = authService.encodePassword(newPassword)
-        appCustomerRepository.save(currentAppAdmin)
-        log.debug("Changed admin password with email [${currentAppAdmin.email}]")
-
-        // Inactivate current session after successful password reset
-        apiSessionService.inactivateCurrentSession()
     }
 
     fun getCurrentCustomer(): AppCustomer {

@@ -2,7 +2,10 @@ package com.example.apiboilerplate.services
 
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
+import com.example.apiboilerplate.dtos.auth.ResetPasswordRequest
+import com.example.apiboilerplate.enums.AppEmails
 import com.example.apiboilerplate.enums.AppPaths
+import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
@@ -10,6 +13,9 @@ import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.repositories.AppAdminRepository
 import com.example.apiboilerplate.repositories.AppCustomerRepository
+import com.example.apiboilerplate.services.base.ApiSessionService
+import com.example.apiboilerplate.services.base.AuthService
+import com.example.apiboilerplate.services.base.EmailService
 import com.example.apiboilerplate.services.base.StorageService
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
@@ -18,12 +24,22 @@ import java.util.*
 
 @Service
 class AppUserService(
+    private val authService: AuthService,
+    private val apiSessionService: ApiSessionService,
+    private val emailService: EmailService,
     private val appAdminRepository: AppAdminRepository,
     private val appCustomerRepository: AppCustomerRepository,
     private val storageService: StorageService
 ) {
 
     companion object { private val log by ApiLogger() }
+
+    fun saveUser(appUser: AppUser): AppUser {
+        return when (appUser.role) {
+            UserRole.ADMIN -> appAdminRepository.save(appUser as AppAdmin)
+            UserRole.CUSTOMER -> appCustomerRepository.save(appUser as AppCustomer)
+        }
+    }
 
     fun getCurrentUserFromDb(cached: Boolean = false): AppUser? {
 
@@ -53,11 +69,63 @@ class AppUserService(
         return appUser
     }
 
-    fun saveUser(appUser: AppUser): AppUser {
-        return when (appUser.role) {
-            UserRole.ADMIN -> appAdminRepository.save(appUser as AppAdmin)
-            UserRole.CUSTOMER -> appCustomerRepository.save(appUser as AppCustomer)
+    fun getUserByEmail(email: String, userRole: UserRole): AppUser? {
+        return when (userRole) {
+            UserRole.ADMIN -> appAdminRepository.findAppAdminByEmail(email)
+            UserRole.CUSTOMER -> appCustomerRepository.findAppCustomerByEmail(email)
         }
+    }
+
+    fun forgotPassword(email: String, userRole: UserRole) {
+        log.info("User [$email] forgot password")
+
+        // Get user from repository
+        val appUser = getUserByEmail(email, userRole)
+            ?: throw ApiExceptionModule.User.UserNotFoundException(email)
+
+        // Create new api-session with RESET_PASSWORD permission
+        val sessionToken = authService.generateNewSessionToken()
+        apiSessionService.createAndSaveApiSession(appUser, sessionToken, listOf(Permission.RESET_PASSWORD), false)
+
+        // Send to user's email session token to reset password
+        emailService.send(
+            AppEmails.ADMIN, email, "Forgot password",
+            "To change password use session-token: $sessionToken")
+
+        log.debug("Sent email to recover password to user [${appUser.role} / ${appUser.email}]")
+    }
+
+    fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
+        val currentUser = getCurrentUserFromDb()!!
+
+        // Check if old-password matches current password
+        if (!authService.passwordMatchesEncoded(resetPasswordRequest.oldPassword, currentUser.passwordHash)) {
+            throw ApiExceptionModule.Auth.IncorrectPasswordException()
+        }
+
+        log.info("Changing user password with email [${currentUser.email}]")
+        currentUser.passwordHash = authService.encodePassword(resetPasswordRequest.newPassword)
+        this.saveUser(currentUser)
+        log.debug("Changed user password with email [${currentUser.email}]")
+    }
+
+    fun forceResetPassword(newPassword: String) {
+
+        // Double check if current session has ResetPassword permission - this was probably checked at controller level as well
+        val currentPermissions = ApiSessionContext.getCurrentApiCallContext().apiSession!!.permissions
+        if (currentPermissions.contains(Permission.RESET_PASSWORD)) {
+            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(currentPermissions, ApiSessionContext.getCurrentApiCallContext().request.method)
+        }
+
+        // Change password for user of current session
+        val currentUser = getCurrentUserFromDb()!!
+        log.info("Changing user password with email [${currentUser.email}]")
+        currentUser.passwordHash = authService.encodePassword(newPassword)
+        saveUser(currentUser)
+        log.debug("Changed user password with email [${currentUser.email}]")
+
+        // Inactivate current session after successful password reset
+        apiSessionService.inactivateCurrentSession()
     }
 
     fun updateLastActivityDt(appUser: AppUser): AppUser {
@@ -69,6 +137,7 @@ class AppUserService(
     }
 
     fun uploadProfileImage(file: MultipartFile) {
+        // Throw exception if file is empty
         if (file.isEmpty) {
             log.error("Cannot upload empty file")
             throw ApiExceptionModule.General.BadRequestException("Cannot upload empty file")

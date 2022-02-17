@@ -8,16 +8,20 @@ import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.AppAdminService
+import com.example.apiboilerplate.services.AppUserService
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import javax.transaction.Transactional
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/admin")
 class AppAdminController(
-    private val appAdminService: AppAdminService
+    private val appAdminService: AppAdminService,
+    val appUserService: AppUserService
 ): AbstractController() {
 
     // AUTH ENDPOINTS
@@ -37,14 +41,14 @@ class AppAdminController(
     @PostMapping("/forgot_password")
     @Transactional
     fun forgotPassword(@RequestParam email: String): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appAdminService.forgotPassword(email), HttpStatus.OK)
+        return response(appUserService.forgotPassword(email, UserRole.ADMIN), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/reset_password")
     @Transactional
     fun resetPassword(@RequestBody resetPasswordRequest: ResetPasswordRequest): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appAdminService.resetPassword(resetPasswordRequest), HttpStatus.OK)
+        return response(appUserService.resetPassword(resetPasswordRequest), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
@@ -52,7 +56,7 @@ class AppAdminController(
     @PostMapping("/force_reset_password")
     @Transactional
     fun forceResetPassword(@RequestBody req: ForceResetPasswordRequest): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appAdminService.forceResetPassword(req.newPassword), HttpStatus.OK)
+        return response(appUserService.forceResetPassword(req.newPassword), HttpStatus.OK)
     }
 
     // GET ENDPOINTS
@@ -96,6 +100,17 @@ class AppAdminController(
     @Transactional
     fun deleteAdmin(@RequestParam adminId: Long): ResponseEntity<ResponsePayload<Any?>> {
         return response(appAdminService.deleteAdmin(adminId), HttpStatus.OK)
+    }
+
+    @SecuredRole([UserRole.CUSTOMER])
+    @PostMapping(
+        path = ["/upload_profile_image"],
+        consumes = [MediaType.MULTIPART_FORM_DATA_VALUE],
+        produces = [MediaType.APPLICATION_JSON_VALUE]
+    )
+    @Transactional
+    fun uploadProfileImage(@RequestParam file: MultipartFile): ResponseEntity<ResponsePayload<Any?>> {
+        return response(appUserService.uploadProfileImage(file), HttpStatus.OK)
     }
 
 }

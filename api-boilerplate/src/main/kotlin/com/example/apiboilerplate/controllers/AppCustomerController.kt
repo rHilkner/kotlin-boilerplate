@@ -41,14 +41,14 @@ class AppCustomerController(
     @PostMapping("/forgot_password")
     @Transactional
     fun forgotPassword(@RequestParam email: String): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appCustomerService.forgotPassword(email), HttpStatus.OK)
+        return response(appUserService.forgotPassword(email, UserRole.CUSTOMER), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
     @PostMapping("/reset_password")
     @Transactional
     fun resetPassword(@RequestBody resetPasswordRequest: ResetPasswordRequest): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appCustomerService.resetPassword(resetPasswordRequest), HttpStatus.OK)
+        return response(appUserService.resetPassword(resetPasswordRequest), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
@@ -56,7 +56,7 @@ class AppCustomerController(
     @PostMapping("/force_reset_password")
     @Transactional
     fun forceResetPassword(@RequestBody req: ForceResetPasswordRequest): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appCustomerService.forceResetPassword(req.newPassword), HttpStatus.OK)
+        return response(appUserService.forceResetPassword(req.newPassword), HttpStatus.OK)
     }
 
     // GET ENDPOINTS
