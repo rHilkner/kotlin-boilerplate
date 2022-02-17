@@ -13,8 +13,8 @@ class AppAdmin: AppUser {
     @Column(name = "admin_id")
     var adminId: Long? = null
 
-    constructor()
-    constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String) {
+    constructor(): super()
+    constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String): super() {
         ObjectUtil.copyProps(adminSignUpRequestDTO, this)
         this.passwordHash = passwordHash
     }

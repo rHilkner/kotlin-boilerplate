@@ -19,11 +19,8 @@ class AppCustomerService(
     private val validatorService: ValidatorService,
     private val appCustomerRepository: AppCustomerRepository,
     private val authService: AuthService,
-    private val apiSessionService: ApiSessionService,
     private val appUserService: AppUserService,
-    private val emailService: EmailService,
-    private val securityService: SecurityService,
-    private val storageService: StorageService
+    private val securityService: SecurityService
 ) {
 
     companion object { private val log by ApiLogger() }

@@ -30,7 +30,7 @@ class ApiSessionContext(
         }
 
         fun clearApiCallContext() {
-            threadLocal.remove();
+            threadLocal.remove()
             MDC.remove(TRANSACTION_ID_KEY)
         }
     }

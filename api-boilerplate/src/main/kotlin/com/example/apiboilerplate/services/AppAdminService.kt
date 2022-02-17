@@ -11,9 +11,7 @@ import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.repositories.AppAdminRepository
-import com.example.apiboilerplate.services.base.ApiSessionService
 import com.example.apiboilerplate.services.base.AuthService
-import com.example.apiboilerplate.services.base.EmailService
 import com.example.apiboilerplate.services.base.SecurityService
 import org.springframework.stereotype.Service
 
@@ -22,9 +20,7 @@ class AppAdminService(
     private val validatorService: ValidatorService,
     private val appAdminRepository: AppAdminRepository,
     private val authService: AuthService,
-    private val apiSessionService: ApiSessionService,
     private val appUserService: AppUserService,
-    private val emailService: EmailService,
     private val securityService: SecurityService
 ) {
 

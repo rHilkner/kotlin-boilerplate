@@ -19,7 +19,7 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
 
         if (response.characterEncoding == null) {
-            response.characterEncoding = "UTF-8"; // Or whatever default. UTF-8 is good for World Domination.
+            response.characterEncoding = "UTF-8" // Or whatever default. UTF-8 is good for World Domination.
         }
 
         // Instantiate wrappers for request and response objects to be able to read data

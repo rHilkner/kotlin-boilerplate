@@ -10,7 +10,7 @@ import javax.persistence.Convert
 import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
-abstract class AppUser: DbSoftDelete {
+abstract class AppUser: DbSoftDelete() {
 
     val userId: Long?
         get() {
@@ -59,14 +59,6 @@ abstract class AppUser: DbSoftDelete {
     var lastAccessDt: Date = Date()
 
     @Column(name = "last_access_ip")
-    var lastAccessIp: String? = null
-
-    constructor()
-    constructor(email: String, name: String, password: String) {
-        this.email = email
-        this.name = name
-        this.passwordHash = password
-        this.lastAccessIp = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
-    }
+    var lastAccessIp: String? = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
 
 }

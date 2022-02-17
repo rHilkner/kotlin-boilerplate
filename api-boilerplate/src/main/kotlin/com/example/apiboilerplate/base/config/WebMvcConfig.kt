@@ -2,7 +2,6 @@ package com.example.apiboilerplate.base.config
 
 import com.example.apiboilerplate.base.interceptors.security.AuthInterceptor
 import com.example.apiboilerplate.base.interceptors.sys_call_log.ApiCallContextFilter
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.FilterRegistrationBean
 import org.springframework.context.annotation.Bean

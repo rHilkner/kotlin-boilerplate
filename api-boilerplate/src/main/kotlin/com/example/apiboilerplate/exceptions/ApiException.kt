@@ -10,7 +10,4 @@ abstract class ApiException(
     var debugMessage: String = errorMessage
 ) : Exception() {
     var timestamp: Date = Date()
-
-    constructor(errorMessage: String) : this(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage)
-
 }
