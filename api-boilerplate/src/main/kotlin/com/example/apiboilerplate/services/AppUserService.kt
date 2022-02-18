@@ -17,7 +17,6 @@ import com.example.apiboilerplate.services.base.ApiSessionService
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.EmailService
 import com.example.apiboilerplate.services.base.StorageService
-import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -41,7 +40,12 @@ class AppUserService(
         }
     }
 
-    fun getCurrentUserFromDb(cached: Boolean = false): AppUser? {
+    fun getCurrentUserOrThrow(): AppUser {
+        return getCurrentUser()
+            ?: throw ApiExceptionModule.General.NullPointer("Current session user is null")
+    }
+
+    fun getCurrentUser(cached: Boolean = false): AppUser? {
 
         if (cached && ApiSessionContext.getCurrentApiCallContext().currentUser != null) {
             return ApiSessionContext.getCurrentApiCallContext().currentUser
@@ -96,7 +100,7 @@ class AppUserService(
     }
 
     fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
-        val currentUser = getCurrentUserFromDb()!!
+        val currentUser = getCurrentUserOrThrow()
 
         // Check if old-password matches current password
         if (!authService.passwordMatchesEncoded(resetPasswordRequest.oldPassword, currentUser.passwordHash)) {
@@ -118,7 +122,7 @@ class AppUserService(
         }
 
         // Change password for user of current session
-        val currentUser = getCurrentUserFromDb()!!
+        val currentUser = getCurrentUserOrThrow()
         log.info("Changing user password with email [${currentUser.email}]")
         currentUser.passwordHash = authService.encodePassword(newPassword)
         saveUser(currentUser)
@@ -137,31 +141,24 @@ class AppUserService(
     }
 
     fun uploadProfileImage(file: MultipartFile) {
-        // Throw exception if file is empty
-        if (file.isEmpty) {
-            log.error("Cannot upload empty file")
-            throw ApiExceptionModule.General.BadRequestException("Cannot upload empty file")
-        }
-
-        // Throw exception if file is not an image
-        if (!listOf(MediaType.IMAGE_JPEG.toString(), MediaType.IMAGE_PNG.toString()).contains(file.contentType)) {
-            log.error("File provided is not a JPEG or PNG image")
-            throw ApiExceptionModule.General.BadRequestException("File provided is not a JPEG or PNG image")
-        }
-
-        // Add metadata to file
-        val metadata: MutableMap<String, String> = HashMap()
-        metadata["Content-Type"] = file.contentType.toString()
-        metadata["Content-Length"] = file.size.toString()
-
         // Save image to server's internal storage
-        val filePath = storageService.getCompletePathFor(file.name, AppPaths.CUSTOMER_PROFILE_IMAGES)
-        storageService.save(file, filePath)
+        val appUser = this.getCurrentUserOrThrow()
+        log.info("Saving user [${appUser.userId}] profile image")
+        val fileDirectory = AppPaths.getProfileImageDirectory(appUser.userId!!, appUser.role)
+        val fileName = "profile_image.png"
+        storageService.saveImage(file.bytes, fileDirectory, fileName)
 
         // Save profile-image path to user
-        val appUser = this.getCurrentUserFromDb()!!
-        appUser.profileImagePath = filePath
+        val fullPath = fileDirectory+fileName
+        appUser.profileImagePath = fullPath
         this.saveUser(appUser)
+        log.debug("User [${appUser.userId}] profile picture saved successfully at [$fullPath]")
+    }
+
+    fun downloadCurrentUserProfileImage(): ByteArray? {
+        val appUser = this.getCurrentUserOrThrow()
+        log.info("Downloading user [${appUser.userId}] profile image")
+        return appUser.profileImagePath?.let { storageService.downloadImage(it) }
     }
 
 }

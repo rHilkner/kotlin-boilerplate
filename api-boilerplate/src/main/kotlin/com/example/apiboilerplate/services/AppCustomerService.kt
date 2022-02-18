@@ -11,12 +11,16 @@ import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.repositories.AppCustomerRepository
-import com.example.apiboilerplate.services.base.*
+import com.example.apiboilerplate.services.base.AuthService
+import com.example.apiboilerplate.services.base.SecurityService
+import com.example.apiboilerplate.validators.EmailValidator
+import com.example.apiboilerplate.validators.PasswordValidator
 import org.springframework.stereotype.Service
 
 @Service
 class AppCustomerService(
-    private val validatorService: ValidatorService,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator,
     private val appCustomerRepository: AppCustomerRepository,
     private val authService: AuthService,
     private val appUserService: AppUserService,
@@ -46,11 +50,11 @@ class AppCustomerService(
         log.info("Signing up new customer with email [${customerSignUpRequestDTO.email}]")
 
         // Validate and encode password
-        validatorService.validatePassword(customerSignUpRequestDTO.password)
+        passwordValidator.passwordFormat(customerSignUpRequestDTO.password)
 
         // Validate user information
-        validatorService.validateEmail(customerSignUpRequestDTO.email)
-        validatorService.validateEmailAlreadyUsed(customerSignUpRequestDTO.email, UserRole.CUSTOMER)
+        emailValidator.emailFormat(customerSignUpRequestDTO.email)
+        emailValidator.emailNotAlreadyUsed(customerSignUpRequestDTO.email, UserRole.CUSTOMER)
 
         // Create new user
         val passwordHash = authService.encodePassword(customerSignUpRequestDTO.password)
@@ -68,7 +72,7 @@ class AppCustomerService(
     }
 
     fun getCurrentCustomer(): AppCustomer {
-        return appUserService.getCurrentUserFromDb() as AppCustomer
+        return appUserService.getCurrentUser() as AppCustomer
     }
 
     fun getCurrentCustomerDto(): AppCustomerDTO {
@@ -86,7 +90,7 @@ class AppCustomerService(
      * Any other field that has been modified will be ignored
      */
     fun updateCurrentCustomer(newAppCustomerDTO: AppCustomerDTO): AppCustomerDTO {
-        val currentAppCustomer = appUserService.getCurrentUserFromDb() as AppCustomer
+        val currentAppCustomer = appUserService.getCurrentUser() as AppCustomer
 
         // Verify if current user is trying to update some user other than himself
         if (currentAppCustomer.customerId != newAppCustomerDTO.customerId) {

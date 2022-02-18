@@ -20,6 +20,9 @@ class AppCustomerDTO(appCustomer: AppCustomer) {
     @JsonProperty("name")
     lateinit var name: String
 
+    @JsonProperty("profileImagePath")
+    lateinit var profileImagePath: String
+
     @JsonProperty("phone")
     var phone: String? = null
 

@@ -13,11 +13,14 @@ import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.repositories.AppAdminRepository
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.SecurityService
+import com.example.apiboilerplate.validators.EmailValidator
+import com.example.apiboilerplate.validators.PasswordValidator
 import org.springframework.stereotype.Service
 
 @Service
 class AppAdminService(
-    private val validatorService: ValidatorService,
+    private val emailValidator: EmailValidator,
+    private val passwordValidator: PasswordValidator,
     private val appAdminRepository: AppAdminRepository,
     private val authService: AuthService,
     private val appUserService: AppUserService,
@@ -47,11 +50,11 @@ class AppAdminService(
         log.info("Signing up new admin with email [${adminSignUpRequestDTO.email}]")
 
         // Validate and encode password
-        validatorService.validatePassword(adminSignUpRequestDTO.password)
+        passwordValidator.passwordFormat(adminSignUpRequestDTO.password)
 
         // Validate user information
-        validatorService.validateEmail(adminSignUpRequestDTO.email)
-        validatorService.validateEmailAlreadyUsed(adminSignUpRequestDTO.email, UserRole.ADMIN)
+        emailValidator.emailFormat(adminSignUpRequestDTO.email)
+        emailValidator.emailNotAlreadyUsed(adminSignUpRequestDTO.email, UserRole.ADMIN)
 
         // Create new user
         val passwordHash = authService.encodePassword(adminSignUpRequestDTO.password)
@@ -69,7 +72,7 @@ class AppAdminService(
     }
 
     fun getCurrentAdmin(): AppAdmin {
-        return appUserService.getCurrentUserFromDb() as AppAdmin
+        return appUserService.getCurrentUser() as AppAdmin
     }
 
     fun getCurrentAdminDto(): AppAdminDTO {
@@ -87,7 +90,7 @@ class AppAdminService(
      * Any other field that has been modified will be ignored
      */
     fun updateCurrentAdmin(newAppAdminDTO: AppAdminDTO): AppAdminDTO {
-        val currentAppAdmin = appUserService.getCurrentUserFromDb() as AppAdmin
+        val currentAppAdmin = appUserService.getCurrentUser() as AppAdmin
 
         // Verify if current user is trying to update some user other than himself
         if (currentAppAdmin.adminId != newAppAdminDTO.adminId) {

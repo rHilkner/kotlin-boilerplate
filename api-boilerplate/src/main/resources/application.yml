@@ -26,8 +26,6 @@ spring:
     password: ${db_password}
   # JPA properties
   jpa:
-    hibernate:
-      ddl-auto: none # When you launch the application for the first time - switch "none" at "create"
     show-sql: false
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -102,8 +100,9 @@ boilerplate-env:
     session-expires-in: 1000000     # number of seconds session is valid for after last activity
     session-token-length: 72
   paths:
-    admin-profile-images: ./storage/admin_profile_images/
-    customer-profile-images: ./storage/customer_profile_images/
+    public:
+      admin-profile-images: ./storage/private/admin/{adminId}/profile_image/
+      customer-profile-images: ./storage/private/customer/{customerId}/profile_image/
 
 --- # DEBUG PROFILE
 
@@ -112,8 +111,6 @@ spring:
     activate:
       on-profile: debug
   jpa:
-    hibernate:
-      ddl-auto: none # When you launch the application for the first time - switch "none" at "create"
     show-sql: false
   mail: # be sure to run maildev locally (check scripts/maildev_cheatsheet.sh)
     host: localhost

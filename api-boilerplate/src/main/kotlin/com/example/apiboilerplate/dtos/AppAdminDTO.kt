@@ -20,6 +20,9 @@ class AppAdminDTO(appAdmin: AppAdmin) {
     @JsonProperty("name")
     lateinit var name: String
 
+    @JsonProperty("profileImagePath")
+    lateinit var profileImagePath: String
+
     @JsonProperty("role")
     var role: UserRole = UserRole.ADMIN
 

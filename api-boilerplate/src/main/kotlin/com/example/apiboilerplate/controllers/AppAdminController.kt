@@ -79,6 +79,12 @@ class AppAdminController(
         }
     }
 
+    @SecuredRole([UserRole.CUSTOMER])
+    @GetMapping("/download_current_user_profile_image")
+    fun getCurrentUserProfileImage(): ByteArray? {
+        return appUserService.downloadCurrentUserProfileImage()
+    }
+
     // POST ENDPOINTS
 
     @SecuredRole([UserRole.ADMIN])

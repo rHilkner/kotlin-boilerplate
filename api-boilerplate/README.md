@@ -51,7 +51,7 @@ Code setup
 ## Features
 
 API features
-- Client API: login, sign-up, forgot_password
+- Client API: login, sign-up, forgot_password, upload_profile_picture
 - Admin API: login, sign-up, get users, edit users, delete users
 - Security: Encrypted password and API Session Token
 - Exception handling: All app exceptions are configured in one class (ApiExceptionModule)
