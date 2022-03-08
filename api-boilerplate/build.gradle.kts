@@ -43,6 +43,9 @@ dependencies {
 	implementation("com.sun.mail:javax.mail:1.6.2")
 	implementation("org.springframework.boot:spring-boot-starter-mail:2.6.3")
 
+	// Image scaling
+	implementation("org.imgscalr:imgscalr-lib:4.2")
+
 	// Lombok
 	compileOnly("org.projectlombok:lombok:1.18.8")
 	annotationProcessor("org.projectlombok:lombok:1.18.8")

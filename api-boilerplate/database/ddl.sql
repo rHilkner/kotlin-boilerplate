@@ -20,6 +20,7 @@ create table app_admin (
     status_cd text not null,
     last_access_dt timestamp not null,
     last_access_ip text,
+    last_login_dt timestamp not null,
     -- Customer specific columns
     -- NONE
     -- Soft delete columns
@@ -45,6 +46,7 @@ create table app_customer (
     status_cd text not null,
     last_access_dt timestamp not null,
     last_access_ip text,
+    last_login_dt timestamp not null,
     -- Customer specific columns
     phone text,
     document_id text,

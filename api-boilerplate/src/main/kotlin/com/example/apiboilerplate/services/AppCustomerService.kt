@@ -40,6 +40,7 @@ class AppCustomerService(
             ?: throw ApiExceptionModule.User.UserNotFoundException(loginRequestDTO.email)
         // Authenticate user
         val apiSession = authService.authenticate(appCustomer, loginRequestDTO.password)
+        appUserService.updateLastLoginDt(appCustomer)
 
         // If no error was thrown, return response dto
         return AuthAppCustomerResponseDTO(apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession),

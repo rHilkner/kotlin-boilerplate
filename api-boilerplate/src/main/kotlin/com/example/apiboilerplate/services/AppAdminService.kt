@@ -40,6 +40,7 @@ class AppAdminService(
             ?: throw ApiExceptionModule.User.UserNotFoundException(loginRequestDTO.email)
         // Authenticate user
         val apiSession = authService.authenticate(appAdmin, loginRequestDTO.password)
+        appUserService.updateLastLoginDt(appAdmin)
 
         // If no error was thrown, return response dto
         return AuthAppAdminResponseDTO(apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession),

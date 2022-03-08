@@ -26,15 +26,13 @@ class StorageService(
     fun saveImage(imageBytes: ByteArray, directory: String, fileName: String) {
         fileValidator.fileNotEmpty(imageBytes)
         fileValidator.imageFile(imageBytes)
-        val pngFile = FileUtil.convertImageBytesToPng(imageBytes)
-        saveFile(pngFile, directory, fileName)
+        storagePermissionsValidator.checkCurrentUserWritePermissions(directory)
+        saveFile(imageBytes, directory, fileName)
     }
 
     private fun saveFile(fileBytes: ByteArray, directory: String, fileName: String) {
         val fullPath = directory + fileName
         log.info("Saving file to [$fullPath]")
-        storagePermissionsValidator.checkCurrentUserWritePermissions(directory)
-        fileValidator.fileNotEmpty(fileBytes)
         val metadata = extractFileMetadata(fileBytes)
         FileUtil.write(fileBytes, metadata, directory, fileName)
         log.debug("File saved to [$fullPath]")

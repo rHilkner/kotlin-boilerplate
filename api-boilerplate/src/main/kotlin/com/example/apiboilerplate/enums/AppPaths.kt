@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component
 class AppPaths {
 
     companion object {
-        private var ADMIN_PROFILE_IMAGES_DIRECTORY: String = ""
-        private var CUSTOMER_PROFILE_IMAGES_DIRECTORY: String = ""
+        private lateinit var ADMIN_PROFILE_IMAGES_DIRECTORY: String
+        private lateinit var CUSTOMER_PROFILE_IMAGES_DIRECTORY: String
 
         fun getProfileImageDirectory(appUserId: Long, userRole: UserRole): String {
             return when (userRole) {

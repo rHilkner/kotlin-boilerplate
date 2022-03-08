@@ -3,10 +3,7 @@ package com.example.apiboilerplate.services
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.ResetPasswordRequest
-import com.example.apiboilerplate.enums.AppEmails
-import com.example.apiboilerplate.enums.AppPaths
-import com.example.apiboilerplate.enums.Permission
-import com.example.apiboilerplate.enums.UserRole
+import com.example.apiboilerplate.enums.*
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppAdmin
 import com.example.apiboilerplate.models.AppCustomer
@@ -28,6 +25,7 @@ class AppUserService(
     private val emailService: EmailService,
     private val appAdminRepository: AppAdminRepository,
     private val appCustomerRepository: AppCustomerRepository,
+    private val imageService: ImageService,
     private val storageService: StorageService
 ) {
 
@@ -132,6 +130,14 @@ class AppUserService(
         apiSessionService.inactivateCurrentSession()
     }
 
+    fun updateLastLoginDt(appUser: AppUser): AppUser {
+        log.debug("Updating lastLoginDt of user [${appUser.userId}]")
+        appUser.lastLoginDt = Date()
+        val updatedAppUser = saveUser(appUser)
+        log.debug("lastLoginDt updated for user [${appUser.userId}]")
+        return updatedAppUser
+    }
+
     fun updateLastActivityDt(appUser: AppUser): AppUser {
         log.debug("Updating lastActivityDt of user [${appUser.userId}]")
         appUser.lastAccessDt = Date()
@@ -145,8 +151,9 @@ class AppUserService(
         val appUser = this.getCurrentUserOrThrow()
         log.info("Saving user [${appUser.userId}] profile image")
         val fileDirectory = AppPaths.getProfileImageDirectory(appUser.userId!!, appUser.role)
-        val fileName = "profile_image.png"
-        storageService.saveImage(file.bytes, fileDirectory, fileName)
+        val fileName = "profile_image.jpg"
+        val optimizedImage = imageService.formatImage(file.bytes, AppImageType.PROFILE)
+        storageService.saveImage(optimizedImage, fileDirectory, fileName)
 
         // Save profile-image path to user
         val fullPath = fileDirectory+fileName

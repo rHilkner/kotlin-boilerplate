@@ -61,4 +61,7 @@ abstract class AppUser: DbSoftDelete() {
     @Column(name = "last_access_ip")
     var lastAccessIp: String? = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
 
+    @Column(name = "last_login_dt")
+    var lastLoginDt: Date = Date()
+
 }
