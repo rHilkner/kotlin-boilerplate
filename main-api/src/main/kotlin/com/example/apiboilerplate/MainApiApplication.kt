@@ -8,12 +8,12 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc
 @SpringBootApplication
 @EnableJpaRepositories
 @EnableWebMvc
-class ApiBoilerplateApplication {
+class MainApiApplication {
 
 	companion object {
 		@JvmStatic
 		fun main(args: Array<String>) {
-			runApplication<ApiBoilerplateApplication>(*args)
+			runApplication<MainApiApplication>(*args)
 		}
 	}
 

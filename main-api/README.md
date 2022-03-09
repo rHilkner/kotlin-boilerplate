@@ -1,4 +1,4 @@
-# api-boilerplate
+# main-api
 
 ## Description
 
