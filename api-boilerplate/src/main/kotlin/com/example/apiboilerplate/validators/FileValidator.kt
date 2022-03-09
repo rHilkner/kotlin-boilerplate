@@ -2,14 +2,11 @@ package com.example.apiboilerplate.validators
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.services.AppUserService
 import com.example.apiboilerplate.utils.FileUtil
 import org.springframework.stereotype.Component
 
 @Component
-class FileValidator(
-    private val appUserService: AppUserService
-) {
+class FileValidator {
 
     companion object { private val log by ApiLogger() }
 

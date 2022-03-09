@@ -13,7 +13,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class EmailValidator(
+    @org.springframework.context.annotation.Lazy
     private val appAdminRepository: AppAdminRepository,
+    @org.springframework.context.annotation.Lazy
     private val appCustomerRepository: AppCustomerRepository
 ) {
 

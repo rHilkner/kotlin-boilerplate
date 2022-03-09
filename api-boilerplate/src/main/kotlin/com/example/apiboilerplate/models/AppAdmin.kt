@@ -6,15 +6,15 @@ import javax.persistence.*
 
 @Entity(name = "AppAdmin")
 @Table(name = "app_admin", schema = "public")
-class AppAdmin: AppUser {
+class AppAdmin(): AppUser() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "admin_id")
     var adminId: Long? = null
 
-    constructor(): super()
-    constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String): super() {
+//    constructor(): super()
+    constructor(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String): this() {
         ObjectUtil.copyProps(adminSignUpRequestDTO, this)
         this.passwordHash = passwordHash
     }

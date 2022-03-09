@@ -13,7 +13,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebMvcConfig(var authInterceptor: AuthInterceptor) : WebMvcConfigurer {
 
-    @Value("\${boilerplate-env.server.allowed_origins}")
+    @Value("\${boilerplate-env.server.allowed-origins}")
     private lateinit var allowedOrigins: List<String>
 
     override fun addInterceptors(registry: InterceptorRegistry) {

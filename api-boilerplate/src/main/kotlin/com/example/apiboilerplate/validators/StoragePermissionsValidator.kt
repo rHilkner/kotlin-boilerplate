@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class StoragePermissionsValidator(
+    @org.springframework.context.annotation.Lazy
     private val appUserService: AppUserService
 ) {
 
