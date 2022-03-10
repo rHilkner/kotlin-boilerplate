@@ -18,7 +18,7 @@ import javax.transaction.Transactional
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/customer")
+@RequestMapping("/api/v1/customer")
 class AppCustomerController(
     private val appCustomerService: AppCustomerService,
     private val appUserService: AppUserService

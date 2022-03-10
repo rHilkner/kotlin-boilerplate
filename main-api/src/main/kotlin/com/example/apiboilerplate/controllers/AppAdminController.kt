@@ -18,7 +18,7 @@ import javax.transaction.Transactional
 import javax.validation.Valid
 
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/api/v1/admin")
 class AppAdminController(
     private val appAdminService: AppAdminService,
     val appUserService: AppUserService
