@@ -14,7 +14,7 @@ class SecurityService {
     fun verifyRoleForCurrentUser(roleExpected: UserRole) {
         val currentUserRole = ApiSessionContext.getCurrentApiCallContext().currentUserRole
         if (currentUserRole != roleExpected) {
-            log.error("Role verification failed")
+            log.error("Role expected: $roleExpected; role provided: $currentUserRole")
             throw ApiExceptionModule.Auth.NotEnoughPrivilegesException("Role expected: $roleExpected; role provided: $currentUserRole")
         }
     }

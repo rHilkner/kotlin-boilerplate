@@ -5,23 +5,14 @@ import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.utils.ObjectUtil
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class AppCustomerDTO(appCustomer: AppCustomer) {
+class AppCustomerDTO(appCustomer: AppCustomer): AppUserDTO(appCustomer, UserRole.ADMIN) {
 
     init {
         ObjectUtil.copyProps(appCustomer, this)
     }
 
     @JsonProperty("customerId")
-    var customerId: Long? = null
-
-    @JsonProperty("email")
-    lateinit var email: String
-
-    @JsonProperty("name")
-    lateinit var name: String
-
-    @JsonProperty("profileImagePath")
-    lateinit var profileImagePath: String
+    var customerId: Long? = super.userId
 
     @JsonProperty("phone")
     var phone: String? = null
@@ -34,8 +25,5 @@ class AppCustomerDTO(appCustomer: AppCustomer) {
 
     @JsonProperty("addressComplement")
     var addressComplement: String? = null
-
-    @JsonProperty("role")
-    var role: UserRole = UserRole.CUSTOMER
 
 }

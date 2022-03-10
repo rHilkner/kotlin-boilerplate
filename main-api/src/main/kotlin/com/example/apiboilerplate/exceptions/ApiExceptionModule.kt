@@ -39,8 +39,10 @@ class ApiExceptionModule {
     }
 
     class User {
-        class UserNotFoundException(email: String)
-            : ApiException(HttpStatus.NO_CONTENT, "User $email not found")
+        class UserNotFoundException: ApiException {
+            constructor(id: Long) : super(HttpStatus.NO_CONTENT, "User $id not found")
+            constructor(email: String) : super(HttpStatus.NO_CONTENT, "User $email not found")
+        }
     }
 
     class Email {

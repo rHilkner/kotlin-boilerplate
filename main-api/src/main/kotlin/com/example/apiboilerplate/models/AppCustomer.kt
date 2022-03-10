@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.models
 
-import com.example.apiboilerplate.dtos.auth.CustomerSignUpRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpAppCustomerRequestDTO
 import com.example.apiboilerplate.utils.ObjectUtil
 import javax.persistence.*
 
@@ -27,8 +27,8 @@ class AppCustomer: AppUser {
     var addressComplement: String? = null
 
     constructor()
-    constructor(customerSignUpRequestDTO: CustomerSignUpRequestDTO, passwordHash: String) {
-        ObjectUtil.copyProps(customerSignUpRequestDTO, this)
+    constructor(signUpAppCustomerRequestDTO: SignUpAppCustomerRequestDTO, passwordHash: String) {
+        ObjectUtil.copyProps(signUpAppCustomerRequestDTO, this)
         this.passwordHash = passwordHash
     }
 

@@ -65,4 +65,7 @@ abstract class AppUser: DbSoftDelete() {
     @Column(name = "last_login_dt")
     var lastLoginDt: Date = Date()
 
+    @Column(name = "sign_up_dt")
+    var signUpDt: Date = Date()
+
 }

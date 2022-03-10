@@ -1,17 +1,22 @@
 package com.example.apiboilerplate.converters
 
+import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.AppAdminDTO
-import com.example.apiboilerplate.dtos.auth.AdminSignUpRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpAppAdminRequestDTO
 import com.example.apiboilerplate.models.AppAdmin
 
 class AppAdminConverter {
 
-    fun signUpDtoToAppAdmin(adminSignUpRequestDTO: AdminSignUpRequestDTO, passwordHash: String): AppAdmin {
-        return AppAdmin(adminSignUpRequestDTO, passwordHash)
-    }
+    companion object { private val log by ApiLogger() }
 
     fun appAdminToAppAdminDto(appAdmin: AppAdmin): AppAdminDTO {
+        log.debug("Converting AppAdmin to AppAdminDTO")
         return AppAdminDTO(appAdmin)
+    }
+
+    fun signUpDtoToAppAdmin(signUpAppAdminRequestDTO: SignUpAppAdminRequestDTO, passwordHash: String): AppAdmin {
+        log.debug("Converting SignUpAppAdminRequestDTO to AppAdmin")
+        return AppAdmin(signUpAppAdminRequestDTO, passwordHash)
     }
 
 }

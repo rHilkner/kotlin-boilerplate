@@ -28,14 +28,14 @@ class AppCustomerController(
 
     @PostMapping("/login")
     @Transactional
-    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<AuthAppCustomerResponseDTO>> {
+    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAppCustomerResponseDTO>> {
         return response(appCustomerService.login(loginRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid customerSignUpRequestDTO: CustomerSignUpRequestDTO): ResponseEntity<ResponsePayload<AuthAppCustomerResponseDTO>> {
-        return response(appCustomerService.signUp(customerSignUpRequestDTO), HttpStatus.OK)
+    fun signUp(@RequestBody @Valid signUpAppCustomerRequestDTO: SignUpAppCustomerRequestDTO): ResponseEntity<ResponsePayload<LoginAppCustomerResponseDTO>> {
+        return response(appCustomerService.signUp(signUpAppCustomerRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")

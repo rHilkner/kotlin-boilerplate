@@ -21,7 +21,8 @@ create table app_admin (
     last_access_dt timestamp not null,
     last_access_ip text,
     last_login_dt timestamp not null,
-    -- Customer specific columns
+    sign_up_dt timestamp not null,
+    -- Admin specific columns
     -- NONE
     -- Soft delete columns
     deleted_status boolean not null default false,
@@ -47,6 +48,7 @@ create table app_customer (
     last_access_dt timestamp not null,
     last_access_ip text,
     last_login_dt timestamp not null,
+    sign_up_dt timestamp not null,
     -- Customer specific columns
     phone text,
     document_id text,

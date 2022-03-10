@@ -28,14 +28,14 @@ class AppAdminController(
 
     @PostMapping("/login")
     @Transactional
-    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<AuthAppAdminResponseDTO>> {
+    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
         return response(appAdminService.login(loginRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid adminSignUpRequestDTO: AdminSignUpRequestDTO): ResponseEntity<ResponsePayload<AuthAppAdminResponseDTO>> {
-        return response(appAdminService.signUp(adminSignUpRequestDTO), HttpStatus.OK)
+    fun signUp(@RequestBody @Valid signUpAppAdminRequestDTO: SignUpAppAdminRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
+        return response(appAdminService.signUp(signUpAppAdminRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")
