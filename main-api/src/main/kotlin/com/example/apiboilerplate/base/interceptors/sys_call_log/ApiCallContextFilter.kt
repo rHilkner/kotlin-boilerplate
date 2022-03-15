@@ -37,7 +37,7 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
             log.error("Error not handled from request: ", e)
             throw e
         } finally {
-            // NOTE: there's been spot an error at org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter.writeInternal(AbstractJackson2HttpMessageConverter.java:463
+            // NOTE: there's been spot an error at org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter.writeInternal(AbstractJackson2HttpMessageConverter.java:454
             // ... in which when a DTO var is a `lateinit` and null at the same time, an error occurs in the conversion
             // ... between Java Object and JSON inside the line 124, but no error is thrown! The error is only set in
             // ... the response, but never thrown. Here below we will handle this kind of situation
