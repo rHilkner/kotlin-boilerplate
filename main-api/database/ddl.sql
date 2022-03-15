@@ -10,6 +10,7 @@ error; -- just to making sure you're not executing this file without reading
 
 -- DDL
 
+drop table app_admin;
 create table app_admin (
     -- User common columns
     admin_id serial constraint pk_admin primary key,
@@ -37,6 +38,7 @@ create table app_admin (
 
 create unique index ux_admin_1 on app_admin (email);
 
+drop table app_customer;
 create table app_customer (
     -- User common columns
     customer_id serial constraint pk_customer primary key,
@@ -67,6 +69,7 @@ create table app_customer (
 
 create unique index ux_customer_1 on app_customer (email);
 
+drop table api_session;
 create table api_session (
     session_id serial constraint pk_api_session primary key,
     user_id numeric not null,
@@ -83,6 +86,7 @@ create table api_session (
 
 create index ix_customer_1 on api_session (token);
 
+drop table sys_call_log;
 create table sys_call_log (
 	call_log_id serial constraint pk_api_log primary key,
     transaction_id text not null,
@@ -105,6 +109,7 @@ create table sys_call_log (
     updated_by text not null
 );
 
+drop table sys_error_log;
 create table sys_error_log (
 	error_log_id serial constraint pk_error_log primary key,
     call_log_id int,
@@ -122,6 +127,7 @@ create table sys_error_log (
     updated_by text not null
 );
 
+drop table sys_email_log;
 create table sys_email_log (
 	email_log_id serial constraint pk_smtp_log primary key,
     call_log_id int,

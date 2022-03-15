@@ -2,11 +2,33 @@
 
 ## Description
 
-This is a Kotlin API with few endpoints, but a robust foundation. Out of the box, open source solution to start developing an API without having to waste time on logging/security setup.
+This is a Kotlin API with a robust foundation and few example endpoints. Out of the box, open source solution to start developing an API in Kotlin without having to waste time on config, logging, security setup.
+
+## Backend (API)
+
+Architecture
+- MVC with the following layers: Controller -> Service -> Repository
+- Objects: DTO (API requests/responses), Model (Repository), ApiException (custom exceptions),
+- Base directory (./base/) with classes that should be transparent for the API developer (config, interceptors, annotations, logger, api-context)
+
+Base configs and interceptors
+- CORS: allowed origins can be set at application.yml/boilerplate-env.server.allowed-origins
+- Security: password with BCrypt; api-session token is a string of 72 randomized upper, lower or digits using java.security.SecureRandom lib 
+- API-monitoring with Prometheus/Grafana
+- API logging: incoming API calls (requests/responses) are logged to SYS_CALL_LOG table (to-do: create another table for outcoming requests)
+- Annotations: SecuredRole (UserRole: CUSTOMER, ADMIN), SecuredPermission (NONE, RESET_PASSWORD from token sent to email)
+- Email: SMTP configs in application.yml; currently using maildev locally (npm install -g maildev)
+- Logger with SLF4J
+
+Postman collection
+- https://go.postman.co/workspace/Kotlin-API-Boilerplate~d990b622-8f82-4a87-85f9-cb48f4e89b5d/collection/5727190-8bd83238-b55d-4888-9f96-78b5db34ac81
+
+FAQ
+- Where to add a new ApiError? -> class ApiErrorModule
 
 ## Database
 
-The database is based on Postgres and have the following tables
+The database is based on Postgres and have the following tables (columns may be outdated, check ddl file)
 - ADMIN: admin_id, name, email, password_hash + soft delete
 - CUSTOMER: customer_id, name, email, password_hash, status_cd, last_access_dt, last_access_ip, phone, document_id, address, address_complement + soft delete 
 - SYS_API_LOG: api_log_id, src_ip, request_endpoint, request_url, request_headers, request_body, response_http_status, response_body
@@ -17,15 +39,6 @@ The database is based on Postgres and have the following tables
 
 DDL at: ./database/ddl.sql
 
-## Backend
-
-Architecture:
-- MVC with the following layers: Controller -> Service -> Repository
-- Interceptors for logging requests and errors to database
-
-FAQ:
-- Where to add a new ApiError? -> class ApiErrorModule
-
 ---
 
 ## Setup
@@ -35,11 +48,11 @@ Database setup
 - Run the ddl file at database/ddl.sql
 
 SMTP setup
-- Local: ./scripts/maildev_cheatsheet.sh
-- Cloud: developer must set SMTP server variables in application.yml file
+- Local: ./scripts/cheatsheets/maildev.sh
+- External server: set SMTP server variables in application.yml
 
 API Monitor setup
-- Start Prometheus and Grafana (./scripts/api_monitor_cheat_sheet.sh)
+- Start Prometheus and Grafana (./scripts/cheatsheets/api_monitor.sh)
 - Access Grafana at localhost:9090
 - Import dashboard ID ? in Grafana
 
@@ -72,3 +85,8 @@ TO-DO
 - Pager Duty: Triggers email and calls phone when detects API failure
 - Docker e container
 - Documentation with SpringDocs
+
+---
+
+
+

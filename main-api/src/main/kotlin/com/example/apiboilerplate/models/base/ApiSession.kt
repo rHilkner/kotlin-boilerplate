@@ -36,9 +36,9 @@ class ApiSession() {
     /** Roles of the user associated to permission (customer, admin) */
     @Convert(converter = UserRole.Converter::class)
     @Column(name = "role")
-    var role: UserRole? = null
+    lateinit var role: UserRole
 
-    /** Permissions on API - forgot-password feature sends a tokeb by email that have permission to reset password, for example */
+    /** Permissions on API - forgot-password feature sends a token by email that have permission to reset password, for example */
     @Column(name = "permissions")
     private var _permissions: String? = null
 

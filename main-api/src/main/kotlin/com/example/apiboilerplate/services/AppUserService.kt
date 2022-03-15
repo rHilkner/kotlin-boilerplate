@@ -65,11 +65,12 @@ class AppUserService(
 
         // Validate user information
         emailValidator.emailFormat(signUpRequestDTO.email)
-        emailValidator.emailNotAlreadyUsed(signUpRequestDTO.email, UserRole.ADMIN)
+        emailValidator.emailNotAlreadyUsed(signUpRequestDTO.email, userRole)
 
         // Create new user
         val passwordHash = authService.encodePassword(signUpRequestDTO.password)
         var newAppUser = appUserConverter.signUpDtoToAppUser(signUpRequestDTO, passwordHash)
+        newAppUser.signUpDt  = Date()
         newAppUser = this.saveUser(newAppUser)
         log.info("New user [${userRole}] was created with email [${newAppUser.email}] and id [${newAppUser.userId}]")
 

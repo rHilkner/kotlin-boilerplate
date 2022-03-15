@@ -13,6 +13,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 @Configuration
 class WebMvcConfig(var authInterceptor: AuthInterceptor) : WebMvcConfigurer {
 
+    // Endpoints to be logged to database table SYS_CALL_LOG
+//    val urlPatternsToBePersisted: Array<String> = arrayOf("/sign_up", "/get_user")
+    val urlPatternsToBePersisted: Array<String> = emptyArray()
+
     @Value("\${boilerplate-env.server.allowed-origins}")
     private lateinit var allowedOrigins: List<String>
 
@@ -27,11 +31,10 @@ class WebMvcConfig(var authInterceptor: AuthInterceptor) : WebMvcConfigurer {
     }
 
     @Bean
-    fun createLoggers(apiCallContextFilter: ApiCallContextFilter): FilterRegistrationBean<ApiCallContextFilter> {
+    fun createApiCallLoggers(apiCallContextFilter: ApiCallContextFilter): FilterRegistrationBean<ApiCallContextFilter> {
         val registrationBean: FilterRegistrationBean<ApiCallContextFilter> = FilterRegistrationBean<ApiCallContextFilter>()
         registrationBean.filter = apiCallContextFilter
-        // Uncomment below to select specific endpoints to be logged to database table SYS_CALL_LOG
-        // registrationBean.addUrlPatterns("/sign_up", "/get_user")
+        registrationBean.addUrlPatterns(*this.urlPatternsToBePersisted)
         return registrationBean
     }
 

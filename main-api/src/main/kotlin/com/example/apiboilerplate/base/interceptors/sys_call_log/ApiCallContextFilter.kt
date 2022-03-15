@@ -33,12 +33,24 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
             // Execute request
             chain.doFilter(requestWrapper, responseWrapper)
             responseWrapper.flushBuffer()
+        } catch (e: Exception) {
+            log.error("Error not handled from request: ", e)
+            throw e
         } finally {
+            // NOTE: there's been spot an error at org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter.writeInternal(AbstractJackson2HttpMessageConverter.java:463
+            // ... in which when a DTO var is a `lateinit` and null at the same time, an error occurs in the conversion
+            // ... between Java Object and JSON inside the line 124, but no error is thrown! The error is only set in
+            // ... the response, but never thrown. Here below we will handle this kind of situation
+            // If response has error status but apiSessionContext.apiException is null, then something really weird happened, let's log this error
+            if (responseWrapper.wrapperHttpStatus != 200 && apiSessionContext.apiException == null) {
+                log.error("API response has error status but apiSessionContext.apiException is null -- check for lateinit vars in response object")
+            }
+
             // Save api-session to database and clear context
             apiSessionContext.endDt = Date()
             val transactionId = apiSessionContext.transactionId
             sysCallLogService.saveContextToSysCallLog(apiSessionContext)
-            ApiSessionContext.clearApiCallContext()
+            // ApiSessionContext.clearApiCallContext() -> Called at AuthInterceptor.postHandle() to handle corner cases
             log.info("Finish api-call-context with transactionId [{}]", transactionId)
         }
 

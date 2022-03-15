@@ -3,11 +3,13 @@ package com.example.apiboilerplate.dtos
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.utils.ObjectUtil
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 
-abstract class AppUserDTO(appUser: AppUser, userRole: UserRole) {
+abstract class AppUserDTO(appUser: AppUser) {
 
-    var userId: Long?
+    @JsonIgnore
+    var userId: Long? = null
 
     @JsonProperty("email")
     lateinit var email: String
@@ -16,14 +18,12 @@ abstract class AppUserDTO(appUser: AppUser, userRole: UserRole) {
     lateinit var name: String
 
     @JsonProperty("profileImagePath")
-    lateinit var profileImagePath: String
+    var profileImagePath: String? = null
 
     @JsonProperty("role")
-    var role: UserRole
+    lateinit var role: UserRole
 
     init {
-        this.userId = appUser.userId
-        this.role = userRole
         ObjectUtil.copyProps(appUser, this)
     }
 

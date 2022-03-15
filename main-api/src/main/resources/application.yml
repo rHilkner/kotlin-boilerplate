@@ -63,7 +63,7 @@ logging:
   level:
     ROOT: warn
     web: info
-    de.codecentric.boot.admin.client: debug
+    com.example.apiboilerplate: info
     org.springframework: info
     org.hibernate: off
   file:
