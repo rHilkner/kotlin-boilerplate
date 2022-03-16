@@ -39,8 +39,9 @@ class ApiCallContextFilter(private val sysCallLogService: SysCallLogService) : F
         } finally {
             // NOTE: there's been spot an error at org.springframework.http.converter.json.AbstractJackson2HttpMessageConverter.writeInternal(AbstractJackson2HttpMessageConverter.java:454
             // ... in which when a DTO var is a `lateinit` and null at the same time, an error occurs in the conversion
-            // ... between Java Object and JSON inside the line 124, but no error is thrown! The error is only set in
-            // ... the response, but never thrown. Here below we will handle this kind of situation
+            // ... between Java Object and JSON inside the line 124, but no error is thrown! Currently, this error has
+            // ... only happened in variables with @JsonProperty annotation. The error is only set in  the HTTP status
+            // ... of the response, but never thrown. Here below we will handle this kind of situation:
             // If response has error status but apiSessionContext.apiException is null, then something really weird happened, let's log this error
             if (responseWrapper.wrapperHttpStatus != 200 && apiSessionContext.apiException == null) {
                 log.error("API response has error status but apiSessionContext.apiException is null -- check for lateinit vars in response object")

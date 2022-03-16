@@ -12,10 +12,11 @@ class ApiSessionResponseDTO(apiSession: ApiSession) {
     lateinit var startDt: Date
     lateinit var lastActivityDt: Date
     lateinit var statusCd: StatusCd
-    lateinit var role: UserRole
+    var role: UserRole?
 
     init {
         ObjectUtil.copyProps(apiSession, this)
+        this.role = apiSession.role
     }
 
 }

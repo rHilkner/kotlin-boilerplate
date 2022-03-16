@@ -34,9 +34,10 @@ class ApiSession() {
     var userId: Long? = null
 
     /** Roles of the user associated to permission (customer, admin) */
+    // Only null when incoming request don't provide API session token - which means no user was authenticated
     @Convert(converter = UserRole.Converter::class)
     @Column(name = "role")
-    lateinit var role: UserRole
+    var role: UserRole? = null
 
     /** Permissions on API - forgot-password feature sends a token by email that have permission to reset password, for example */
     @Column(name = "permissions")
