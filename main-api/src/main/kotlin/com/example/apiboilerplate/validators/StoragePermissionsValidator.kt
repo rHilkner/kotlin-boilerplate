@@ -4,11 +4,12 @@ import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.AppUserService
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 @Component
 class StoragePermissionsValidator(
-    @org.springframework.context.annotation.Lazy
+    @Lazy
     private val appUserService: AppUserService
 ) {
 

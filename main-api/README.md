@@ -14,7 +14,7 @@ Architecture
 Base configs and interceptors
 - CORS: allowed origins can be set at application.yml/boilerplate-env.server.allowed-origins
 - Security: password with BCrypt; api-session token is a string of 72 randomized upper, lower or digits using java.security.SecureRandom lib 
-- API-monitoring with Prometheus/Grafana
+- API-monitoring with New Relic
 - API logging: incoming API calls (requests/responses) are logged to SYS_CALL_LOG table (to-do: create another table for outcoming requests)
 - Annotations: SecuredRole (UserRole: CUSTOMER, ADMIN), SecuredPermission (NONE, RESET_PASSWORD from token sent to email)
 - Email: SMTP configs in application.yml; currently using maildev locally (npm install -g maildev)
@@ -51,11 +51,6 @@ SMTP setup
 - Local: ./scripts/cheatsheets/maildev.sh
 - External server: set SMTP server variables in application.yml
 
-API Monitor setup
-- Start Prometheus and Grafana (./scripts/cheatsheets/api_monitor.sh)
-- Access Grafana at localhost:9090
-- Import dashboard ID ? in Grafana
-
 Code setup
 - Set database, SMTP and API Monitor and you should have everything that this project uses
 
@@ -70,7 +65,7 @@ API features
 - Exception handling: All app exceptions are configured in one class (ApiExceptionModule)
 - Automatic enum conversion to API and Database (DbEnumConverter)
 - Forgot password: Basic email sending and SMTP integration
-- Monitoring: Dashboard made with Spring Boot Actuator, Prometheus and Grafana
+- Monitoring (APM & Logging): using New Relic free tier
 - Postman collection
 - Logs
 
