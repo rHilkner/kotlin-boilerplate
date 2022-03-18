@@ -59,7 +59,8 @@ spring:
 logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{transactionId}] %C{1} [%M] - %m%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %clr(%-5p) [%t] txn[%X{transactionId}] %C{1} [%M] - %m%n"
+    # No color on logfile
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p [%t] txn[%X{transactionId}] %C{1} [%M] - %m%n"
   level:
     ROOT: warn
     web: info
@@ -68,26 +69,6 @@ logging:
     org.hibernate: off
   file:
     name: logs/app.log
-  logback:
-    rollingpolicy:
-      max-file-size: 100MB
-      max-history: 365  # Keep logs for 1 year
-
-# Actuator
-management:
-  metrics:
-    tags:
-      application: ${spring.application.name}
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-    jmx:
-      exposure:
-        include: "*"
-  endpoint:
-    health:
-      show-details: always
 
 boilerplate-env:
   server:
@@ -103,6 +84,7 @@ boilerplate-env:
     public:
       admin-profile-images: ./storage/private/admin/{adminId}/profile_image/
       customer-profile-images: ./storage/private/customer/{customerId}/profile_image/
+
 
 --- # DEBUG PROFILE
 

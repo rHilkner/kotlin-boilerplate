@@ -36,8 +36,7 @@ dependencies {
 	implementation("com.auth0:java-jwt:3.18.3")
 
 	// API Monitor
-	implementation("io.micrometer:micrometer-registry-prometheus:1.7.3")
-	implementation("io.github.mweirauch:micrometer-jvm-extras:0.2.2")
+	implementation("com.newrelic.logging:log4j2:2.0")
 
 	// SMTP
 	implementation("com.sun.mail:javax.mail:1.6.2")
@@ -69,4 +68,15 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.register<de.undercouch.gradle.tasks.download.Download>("downloadNewrelic") {
+	mkdir("newrelic")
+	src("https://download.newrelic.com/newrelic/java-agent/newrelic-agent/current/newrelic-java.zip")
+	dest(file("newrelic"))
+}
+
+tasks.register<Copy>("unzipNewrelic") {
+	from(zipTree(file("newrelic/newrelic-java.zip")))
+	into(rootDir)
 }

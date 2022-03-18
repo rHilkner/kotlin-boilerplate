@@ -5,6 +5,7 @@ import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.repositories.AppAdminRepository
 import com.example.apiboilerplate.repositories.AppCustomerRepository
 import org.apache.commons.validator.routines.EmailValidator
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component
 
 /**
@@ -13,9 +14,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class EmailValidator(
-    @org.springframework.context.annotation.Lazy
+    @Lazy
     private val appAdminRepository: AppAdminRepository,
-    @org.springframework.context.annotation.Lazy
+    @Lazy
     private val appCustomerRepository: AppCustomerRepository
 ) {
 
