@@ -2,7 +2,7 @@ package com.example.apiboilerplate.validators
 
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.services.AppUserService
+import com.example.apiboilerplate.services.user.AppUserService
 import org.apache.commons.validator.routines.EmailValidator
 import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Component

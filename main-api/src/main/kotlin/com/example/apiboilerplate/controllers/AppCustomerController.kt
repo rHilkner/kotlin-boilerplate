@@ -8,8 +8,8 @@ import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.services.AppUserService
-import com.example.apiboilerplate.services.CustomerService
+import com.example.apiboilerplate.services.user.AppUserService
+import com.example.apiboilerplate.services.user.CustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity

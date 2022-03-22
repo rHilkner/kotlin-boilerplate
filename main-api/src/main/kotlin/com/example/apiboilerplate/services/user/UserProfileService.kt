@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.services
+package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.converters.AppUserConverter

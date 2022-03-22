@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.services
+package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.LoginAppCustomerResponseDTO
@@ -10,6 +10,7 @@ import com.example.apiboilerplate.enums.AppImageType
 import com.example.apiboilerplate.enums.AppPaths
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.user.Customer
+import com.example.apiboilerplate.services.ImageService
 import com.example.apiboilerplate.services.base.StorageService
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
