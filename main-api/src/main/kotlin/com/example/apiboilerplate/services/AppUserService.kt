@@ -12,10 +12,10 @@ import com.example.apiboilerplate.enums.AppEmails
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.AppUser
-import com.example.apiboilerplate.models.FullUser
 import com.example.apiboilerplate.models.base.ApiSession
-import com.example.apiboilerplate.repositories.AppUserRepository
+import com.example.apiboilerplate.models.user.AppUser
+import com.example.apiboilerplate.models.user.FullUser
+import com.example.apiboilerplate.repositories.user.AppUserRepository
 import com.example.apiboilerplate.services.base.ApiSessionService
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.EmailService

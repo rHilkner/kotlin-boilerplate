@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.dtos.users
 
-import com.example.apiboilerplate.models.CustomerProfile
+import com.example.apiboilerplate.models.user.CustomerProfile
 import com.fasterxml.jackson.annotation.JsonProperty
 
 class CustomerProfileDTO(customerProfile: CustomerProfile): UserProfileDTO() {

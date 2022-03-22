@@ -1,6 +1,6 @@
-package com.example.apiboilerplate.repositories
+package com.example.apiboilerplate.repositories.user
 
-import com.example.apiboilerplate.models.AdminProfile
+import com.example.apiboilerplate.models.user.AdminProfile
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 

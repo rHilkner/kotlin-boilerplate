@@ -8,9 +8,9 @@ import com.example.apiboilerplate.dtos.users.FullUserDTO
 import com.example.apiboilerplate.dtos.users.UserProfileDTO
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.*
-import com.example.apiboilerplate.repositories.AdminProfileRepository
-import com.example.apiboilerplate.repositories.CustomerProfileRepository
+import com.example.apiboilerplate.models.user.*
+import com.example.apiboilerplate.repositories.user.AdminProfileRepository
+import com.example.apiboilerplate.repositories.user.CustomerProfileRepository
 import org.springframework.stereotype.Service
 
 @Service

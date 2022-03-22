@@ -4,9 +4,10 @@ import com.example.apiboilerplate.base.interceptors.sys_call_log.AppHttpRequestW
 import com.example.apiboilerplate.base.interceptors.sys_call_log.AppHttpResponseWrapper
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiException
-import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.base.ApiSession
 import com.example.apiboilerplate.models.base.SysCallLog
+import com.example.apiboilerplate.models.user.AppUser
 import org.slf4j.MDC
 import java.util.*
 
@@ -26,7 +27,8 @@ class ApiSessionContext(
 
         @Synchronized
         fun getCurrentApiCallContext(): ApiSessionContext {
-            return threadLocal.get()
+            val apiSessionContext = threadLocal.get()
+            return apiSessionContext ?: throw ApiExceptionModule.General.NullPointer("API Session Context is null (?)")
         }
 
         fun clearApiCallContext() {
@@ -44,7 +46,7 @@ class ApiSessionContext(
     // Exception
     var apiException: ApiException? = null
 
-    // API call objects
+    // API session info
     var apiSession: ApiSession? = null
     val currentUserId: Long?
         get() = apiSession?.userId
@@ -54,14 +56,16 @@ class ApiSessionContext(
 
     // Object to SYS_CALL_LOG table
     var sysCallLog: SysCallLog = SysCallLog(this)
-        get() {
+        get() { // update before retrieving information
             field.updateData(this)
             return field
         }
 
     init {
+        // Logging transaction-id to SLF4J logger
         MDC.remove(TRANSACTION_ID_KEY)
         MDC.put(TRANSACTION_ID_KEY, this.transactionId)
+        // Create "global variable" for this object to consult information about the user and its permissions
         threadLocal.set(this)
     }
 

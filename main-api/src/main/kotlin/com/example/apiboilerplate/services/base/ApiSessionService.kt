@@ -5,8 +5,8 @@ import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.base.ApiSession
+import com.example.apiboilerplate.models.user.AppUser
 import com.example.apiboilerplate.repositories.base.ApiSessionRepository
 import org.springframework.stereotype.Service
 import java.util.*

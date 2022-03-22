@@ -3,8 +3,8 @@ package com.example.apiboilerplate.converters
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.SignUpAppCustomerRequestDTO
 import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
-import com.example.apiboilerplate.models.AppUser
-import com.example.apiboilerplate.models.CustomerProfile
+import com.example.apiboilerplate.models.user.AppUser
+import com.example.apiboilerplate.models.user.CustomerProfile
 
 class CustomerConverter {
 

@@ -8,8 +8,8 @@ import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.base.ApiSession
+import com.example.apiboilerplate.models.user.AppUser
 import com.example.apiboilerplate.utils.RandomString
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders

@@ -3,7 +3,7 @@ package com.example.apiboilerplate.models.base
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
-import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.models.user.AppUser
 import com.example.apiboilerplate.utils.EnumUtil
 import java.util.*
 import javax.persistence.*

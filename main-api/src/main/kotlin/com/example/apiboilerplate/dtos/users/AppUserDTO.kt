@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.dtos.users
 
 import com.example.apiboilerplate.enums.UserRole
-import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.models.user.AppUser
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.*

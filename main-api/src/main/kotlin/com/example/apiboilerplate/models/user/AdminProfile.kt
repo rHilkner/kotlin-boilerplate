@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.models
+package com.example.apiboilerplate.models.user
 
 import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
 import javax.persistence.*

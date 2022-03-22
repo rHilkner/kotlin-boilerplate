@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.models
+package com.example.apiboilerplate.models.user
 
 class Customer(
     appUser: AppUser,

@@ -7,7 +7,7 @@ import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.dtos.users.*
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.*
+import com.example.apiboilerplate.models.user.*
 import java.util.*
 
 class AppUserConverter {
