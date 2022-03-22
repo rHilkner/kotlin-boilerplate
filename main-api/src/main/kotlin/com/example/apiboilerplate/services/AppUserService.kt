@@ -71,7 +71,7 @@ class AppUserService(
         appUser.lastLoginDt = Date()
         val updatedAppUser = saveAppUser(appUser)
         // Get user with profile
-        val fullUser = userProfileService.getFullUser(updatedAppUser)
+        val fullUser = userProfileService.getFullUserOrThrow(updatedAppUser)
 
         // If no error was thrown, return response dto
         log.info("User [${userRole}] logged in successfully with email [${loginRequestDTO.email}]")

@@ -24,6 +24,8 @@ class CustomerService(
 
     companion object { private val log by ApiLogger() }
 
+    /************************ AUTH & HIGH SECURITY ************************/
+
     fun login(loginRequestDTO: LoginRequestDTO): LoginAppCustomerResponseDTO {
         return appUserService.login(loginRequestDTO, UserRole.CUSTOMER) as LoginAppCustomerResponseDTO
     }
@@ -35,6 +37,8 @@ class CustomerService(
     fun getCurrentCustomerDto(): CustomerDTO {
         return userProfileService.getCurrentFullUserDtoOrThrow() as CustomerDTO
     }
+
+    /************************ CRUD ************************/
 
     fun getCustomerDtoByEmail(email: String): CustomerProfileDTO? {
         return appUserService.getUserDtoByEmail(email, UserRole.CUSTOMER) as CustomerProfileDTO?
@@ -54,6 +58,8 @@ class CustomerService(
     fun deleteCustomer(customerId: Long) {
         appUserService.deleteUser(customerId, UserRole.CUSTOMER)
     }
+
+    /************************ FEATURES ************************/
 
     fun uploadProfileImage(file: MultipartFile) {
         // Save image to server's internal storage

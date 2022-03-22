@@ -16,6 +16,8 @@ class AdminService(
 
     companion object { private val log by ApiLogger() }
 
+    /************************ AUTH & HIGH SECURITY ************************/
+
     fun login(loginRequestDTO: LoginRequestDTO): LoginAppAdminResponseDTO {
         return appUserService.login(loginRequestDTO, UserRole.ADMIN) as LoginAppAdminResponseDTO
     }
@@ -23,6 +25,8 @@ class AdminService(
     fun signUp(signUpAdminRequestDTO: SignUpAdminRequestDTO): LoginAppAdminResponseDTO {
         return appUserService.signUp(signUpAdminRequestDTO, UserRole.ADMIN) as LoginAppAdminResponseDTO
     }
+
+    /************************ CRUD ************************/
 
     fun getCurrentAdminDto(): AdminDTO {
         return userProfileService.getCurrentFullUserDtoOrThrow() as AdminDTO

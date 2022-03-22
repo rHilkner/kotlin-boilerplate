@@ -40,11 +40,20 @@ class UserProfileService(
         }
     }
 
+    /************************ USER PROFILE ************************/
+
+    fun updateUserProfile(currentUserProfile: UserProfile, newUserProfile: UserProfileDTO): UserProfileDTO {
+        return when (appUserConverter.getUserRole(currentUserProfile)) {
+            UserRole.ADMIN -> AdminProfileDTO(currentUserProfile as AdminProfile)
+            UserRole.CUSTOMER -> CustomerProfileDTO(currentUserProfile as CustomerProfile)
+        }
+    }
+
     /************************ FULL USER ************************/
 
     fun getCurrentFullUserOrThrow(): FullUser {
         val appUser = appUserService.getCurrentUserOrThrow()
-        return getFullUser(appUser)
+        return getFullUserOrThrow(appUser)
     }
 
     fun getCurrentFullUserDtoOrThrow(): FullUserDTO {
@@ -53,21 +62,21 @@ class UserProfileService(
     }
 
     fun getFullUserDto(email: String, role: UserRole): FullUserDTO? {
-        val fullUser = getFullUser(email, role)
+        val fullUser = getFullUserOrThrow(email, role)
         return fullUser?.let { appUserConverter.fullUserToFullUserDto(it) }
     }
 
-    fun getFullUser(email: String, role: UserRole): FullUser? {
+    fun getFullUserOrThrow(email: String, role: UserRole): FullUser? {
         val appUser = appUserService.getUserByEmailOrThrow(email, role)
-        return getFullUser(appUser)
+        return getFullUserOrThrow(appUser)
     }
 
-    fun getFullUser(userId: Long): FullUser {
+    fun getFullUserOrThrow(userId: Long): FullUser {
         val appUser = appUserService.getUserByIdOrThrow(userId)
-        return getFullUser(appUser)
+        return getFullUserOrThrow(appUser)
     }
 
-    fun getFullUser(appUser: AppUser): FullUser {
+    fun getFullUserOrThrow(appUser: AppUser): FullUser {
         val userProfile = getUserProfile(appUser)
         return appUserConverter.buildFullUser(appUser, userProfile)
     }
@@ -86,24 +95,14 @@ class UserProfileService(
     }
 
     fun updateUser(newUserDTO: FullUserDTO): FullUserDTO {
-        if (newUserDTO.appUser.userId == null) throw ApiExceptionModule.General.NullPointer("userDTO.userId")
-        val appUser = this.getFullUser(newUserDTO.appUser.userId!!)
+        val appUser = this.getFullUserOrThrow(newUserDTO.appUser.userId!!)
         return updateUser(appUser, newUserDTO)
     }
-
-    /************************ USER PROFILE ************************/
 
     fun updateUser(currentUser: FullUser, newUserDto: FullUserDTO): FullUserDTO {
         val newAppUser = appUserService.updateUser(currentUser.appUser, newUserDto.appUser)
         val newUserProfile = updateUserProfile(currentUser.userProfile, newUserDto.userProfile)
         return appUserConverter.buildFullUserDto(newAppUser, newUserProfile)
-    }
-
-    fun updateUserProfile(currentUserProfile: UserProfile, newUserProfile: UserProfileDTO): UserProfileDTO {
-        return when (appUserConverter.getUserRole(currentUserProfile)) {
-            UserRole.ADMIN -> AdminProfileDTO(currentUserProfile as AdminProfile)
-            UserRole.CUSTOMER -> CustomerProfileDTO(currentUserProfile as CustomerProfile)
-        }
     }
 
 }
