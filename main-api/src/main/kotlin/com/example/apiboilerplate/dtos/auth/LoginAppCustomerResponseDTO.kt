@@ -1,8 +1,8 @@
 package com.example.apiboilerplate.dtos.auth
 
-import com.example.apiboilerplate.dtos.AppCustomerDTO
+import com.example.apiboilerplate.dtos.users.CustomerDTO
 
 class LoginAppCustomerResponseDTO(
-    appCustomer: AppCustomerDTO,
+    customer: CustomerDTO,
     apiSession: ApiSessionResponseDTO
-) : LoginResponseDTO(appCustomer, apiSession)
+) : LoginResponseDTO(customer, apiSession)

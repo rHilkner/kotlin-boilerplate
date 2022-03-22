@@ -1,8 +1,8 @@
 package com.example.apiboilerplate.dtos.auth
 
-import com.example.apiboilerplate.dtos.AppUserDTO
+import com.example.apiboilerplate.dtos.users.FullUserDTO
 
 abstract class LoginResponseDTO(
-    val appUser: AppUserDTO,
+    val appUser: FullUserDTO,
     val apiSession: ApiSessionResponseDTO
 )

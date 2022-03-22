@@ -2,13 +2,14 @@ package com.example.apiboilerplate.controllers
 
 import com.example.apiboilerplate.base.annotations.SecuredPermission
 import com.example.apiboilerplate.base.annotations.SecuredRole
-import com.example.apiboilerplate.dtos.AppCustomerDTO
 import com.example.apiboilerplate.dtos.auth.*
+import com.example.apiboilerplate.dtos.users.CustomerDTO
+import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.services.AppCustomerService
 import com.example.apiboilerplate.services.AppUserService
+import com.example.apiboilerplate.services.CustomerService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -20,7 +21,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/api/v1/customer")
 class AppCustomerController(
-    private val appCustomerService: AppCustomerService,
+    private val customerService: CustomerService,
     private val appUserService: AppUserService
 ): AbstractController() {
 
@@ -29,13 +30,13 @@ class AppCustomerController(
     @PostMapping("/login")
     @Transactional
     fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAppCustomerResponseDTO>> {
-        return response(appCustomerService.login(loginRequestDTO), HttpStatus.OK)
+        return response(customerService.login(loginRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
     fun signUp(@RequestBody @Valid signUpAppCustomerRequestDTO: SignUpAppCustomerRequestDTO): ResponseEntity<ResponsePayload<LoginAppCustomerResponseDTO>> {
-        return response(appCustomerService.signUp(signUpAppCustomerRequestDTO), HttpStatus.OK)
+        return response(customerService.signUp(signUpAppCustomerRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")
@@ -63,14 +64,14 @@ class AppCustomerController(
 
     @SecuredRole([UserRole.CUSTOMER])
     @GetMapping("/get_current_user")
-    fun getCurrentUser(): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
-        return response(appCustomerService.getCurrentCustomerDto(), HttpStatus.OK)
+    fun getCurrentUser(): ResponseEntity<ResponsePayload<CustomerDTO>> {
+        return response(customerService.getCurrentCustomerDto(), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @GetMapping("/get_customer_by_email")
-    fun getCustomerByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
-        val appUserDto = appCustomerService.getCustomerDtoByEmail(email)
+    fun getCustomerByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<CustomerProfileDTO>> {
+        val appUserDto = customerService.getCustomerDtoByEmail(email)
 
         if (appUserDto != null) {
             return response(appUserDto, HttpStatus.OK)
@@ -82,7 +83,7 @@ class AppCustomerController(
     @SecuredRole([UserRole.CUSTOMER])
     @GetMapping("/download_current_user_profile_image")
     fun getCurrentUserProfileImage(): ByteArray? {
-        return appUserService.downloadCurrentUserProfileImage()
+        return customerService.downloadCurrentUserProfileImage()
     }
 
     // POST ENDPOINTS
@@ -90,22 +91,22 @@ class AppCustomerController(
     @SecuredRole([UserRole.CUSTOMER])
     @PostMapping("/update_current_user")
     @Transactional
-    fun updateCurrentUser(@RequestBody newAppCustomerDTO: AppCustomerDTO): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
-        return response(appCustomerService.updateCurrentCustomer(newAppCustomerDTO), HttpStatus.OK)
+    fun updateCurrentUser(@RequestBody newCustomerDTO: CustomerDTO): ResponseEntity<ResponsePayload<CustomerDTO>> {
+        return response(customerService.updateCurrentCustomer(newCustomerDTO), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/update_customer")
     @Transactional
-    fun updateCustomer(@RequestBody newAppCustomerDTO: AppCustomerDTO): ResponseEntity<ResponsePayload<AppCustomerDTO>> {
-        return response(appCustomerService.updateCustomer(newAppCustomerDTO), HttpStatus.OK)
+    fun updateCustomer(@RequestBody newCustomerDTO: CustomerDTO): ResponseEntity<ResponsePayload<CustomerDTO>> {
+        return response(customerService.updateCustomer(newCustomerDTO), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/delete_customer")
     @Transactional
     fun deleteCustomer(@RequestParam customerId: Long): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appCustomerService.deleteCustomer(customerId), HttpStatus.OK)
+        return response(customerService.deleteCustomer(customerId), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
@@ -116,7 +117,7 @@ class AppCustomerController(
     )
     @Transactional
     fun uploadProfileImage(@RequestParam file: MultipartFile): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appUserService.uploadProfileImage(file), HttpStatus.OK)
+        return response(customerService.uploadProfileImage(file), HttpStatus.OK)
     }
 
 }

@@ -1,6 +1,6 @@
 package com.example.apiboilerplate.dtos.auth
 
-class SignUpAppAdminRequestDTO(
+class SignUpAdminRequestDTO(
     email: String,
     name: String,
     password: String

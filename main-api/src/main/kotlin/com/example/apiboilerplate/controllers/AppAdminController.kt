@@ -2,13 +2,15 @@ package com.example.apiboilerplate.controllers
 
 import com.example.apiboilerplate.base.annotations.SecuredPermission
 import com.example.apiboilerplate.base.annotations.SecuredRole
-import com.example.apiboilerplate.dtos.AppAdminDTO
 import com.example.apiboilerplate.dtos.auth.*
+import com.example.apiboilerplate.dtos.users.AdminDTO
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.services.AppAdminService
+import com.example.apiboilerplate.services.AdminService
 import com.example.apiboilerplate.services.AppUserService
+import com.example.apiboilerplate.services.CustomerService
+import com.example.apiboilerplate.services.UserProfileService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -20,8 +22,10 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/api/v1/admin")
 class AppAdminController(
-    private val appAdminService: AppAdminService,
-    val appUserService: AppUserService
+    private val appUserService: AppUserService,
+    private val adminService: AdminService,
+    private val customerService: CustomerService,
+    private val userProfileService: UserProfileService
 ): AbstractController() {
 
     // AUTH ENDPOINTS
@@ -29,13 +33,13 @@ class AppAdminController(
     @PostMapping("/login")
     @Transactional
     fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
-        return response(appAdminService.login(loginRequestDTO), HttpStatus.OK)
+        return response(adminService.login(loginRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid signUpAppAdminRequestDTO: SignUpAppAdminRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
-        return response(appAdminService.signUp(signUpAppAdminRequestDTO), HttpStatus.OK)
+    fun signUp(@RequestBody @Valid signUpAdminRequestDTO: SignUpAdminRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
+        return response(adminService.signUp(signUpAdminRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")
@@ -63,14 +67,14 @@ class AppAdminController(
 
     @SecuredRole([UserRole.ADMIN])
     @GetMapping("/get_current_user")
-    fun getCurrentUser(): ResponseEntity<ResponsePayload<AppAdminDTO>> {
-        return response(appAdminService.getCurrentAdminDto(), HttpStatus.OK)
+    fun getCurrentUser(): ResponseEntity<ResponsePayload<AdminDTO>> {
+        return response(adminService.getCurrentAdminDto(), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @GetMapping("/get_admin_by_email")
-    fun getAdminByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<AppAdminDTO>> {
-        val appUserDto = appAdminService.getAdminDtoByEmail(email)
+    fun getAdminByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<AdminDTO>> {
+        val appUserDto = adminService.getAdminDtoByEmail(email)
 
         if (appUserDto != null) {
             return response(appUserDto, HttpStatus.OK)
@@ -82,7 +86,7 @@ class AppAdminController(
     @SecuredRole([UserRole.CUSTOMER])
     @GetMapping("/download_current_user_profile_image")
     fun getCurrentUserProfileImage(): ByteArray? {
-        return appUserService.downloadCurrentUserProfileImage()
+        return customerService.downloadCurrentUserProfileImage()
     }
 
     // POST ENDPOINTS
@@ -90,22 +94,22 @@ class AppAdminController(
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/update_current_user")
     @Transactional
-    fun updateCurrentUser(@RequestBody newAppAdminDTO: AppAdminDTO): ResponseEntity<ResponsePayload<AppAdminDTO>> {
-        return response(appAdminService.updateCurrentAdmin(newAppAdminDTO), HttpStatus.OK)
+    fun updateCurrentUser(@RequestBody newAdminDTO: AdminDTO): ResponseEntity<ResponsePayload<AdminDTO>> {
+        return response(adminService.updateCurrentAdmin(newAdminDTO), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/update_admin")
     @Transactional
-    fun updateAdmin(@RequestBody newAppAdminDTO: AppAdminDTO): ResponseEntity<ResponsePayload<AppAdminDTO>> {
-        return response(appAdminService.updateAdmin(newAppAdminDTO), HttpStatus.OK)
+    fun updateAdmin(@RequestBody newAdminDTO: AdminDTO): ResponseEntity<ResponsePayload<AdminDTO>> {
+        return response(adminService.updateAdmin(newAdminDTO), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/delete_admin")
     @Transactional
     fun deleteAdmin(@RequestParam adminId: Long): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appAdminService.deleteAdmin(adminId), HttpStatus.OK)
+        return response(adminService.deleteAdmin(adminId), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
@@ -116,7 +120,7 @@ class AppAdminController(
     )
     @Transactional
     fun uploadProfileImage(@RequestParam file: MultipartFile): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appUserService.uploadProfileImage(file), HttpStatus.OK)
+        return response(customerService.uploadProfileImage(file), HttpStatus.OK)
     }
 
 }

@@ -10,21 +10,20 @@ error; -- just to making sure you're not executing this file without reading
 
 -- DDL
 
-drop table app_admin;
-create table app_admin (
+drop table app_user;
+create table app_user (
     -- User common columns
-    admin_id serial constraint pk_admin primary key,
+    user_id serial constraint pk_user primary key,
+    user_uuid text not null,
+    role text not null,
     name text not null,
     email text not null,
-    profile_image_path text,
     password_hash text not null,
     status_cd text not null,
     last_access_dt timestamp not null,
     last_access_ip text,
     last_login_dt timestamp not null,
     sign_up_dt timestamp not null,
-    -- Admin specific columns
-    -- NONE
     -- Soft delete columns
     deleted_status boolean not null default false,
     deleted_dt timestamp,
@@ -35,45 +34,50 @@ create table app_admin (
     updated_dt timestamp not null,
     updated_by text not null
 );
+-- A user is considered unique by the compose key (user_id, role), meaning that a person with email user1@gmail.com
+-- ... that wants to login with many different roles (customer and admin) will need to do both sign-ups and will have
+-- ... a different user (account) for each role
+create unique index ux_user_1 on app_user (email, role);
+create index ix_user_1 on app_user (user_uuid);
+create index ix_user_2 on app_user (email);
 
-create unique index ux_admin_1 on app_admin (email);
+drop table admin_profile;
+create table admin_profile (
+    admin_profile_id serial constraint pk_admin_profile primary key,
+    user_id int not null, -- fk
+    -- Admin specific columns
+    db_write_permission boolean not null default false, -- is this admin allowed to update/delete data?
+    -- Audit columns
+    created_dt timestamp not null default now(),
+    created_by text not null,
+    updated_dt timestamp not null,
+    updated_by text not null
+);
+create unique index fk_admin_profile_1 on admin_profile (user_id);
 
-drop table app_customer;
-create table app_customer (
-    -- User common columns
-    customer_id serial constraint pk_customer primary key,
-    name text not null,
-    email text not null,
-    profile_image_path text,
-    password_hash text not null,
-    status_cd text not null,
-    last_access_dt timestamp not null,
-    last_access_ip text,
-    last_login_dt timestamp not null,
-    sign_up_dt timestamp not null,
+drop table customer_profile;
+create table customer_profile (
+    customer_profile_id serial constraint pk_customer_profile primary key,
+    user_id int not null, -- fk
     -- Customer specific columns
     phone text,
     document_id text,
     address text,
     address_complement text,
-    -- Soft delete columns
-    deleted_status boolean not null default false,
-    deleted_dt timestamp,
-    deleted_by text,
+    profile_image_path text,
     -- Audit columns
     created_dt timestamp not null default now(),
     created_by text not null,
     updated_dt timestamp not null,
     updated_by text not null
 );
-
-create unique index ux_customer_1 on app_customer (email);
+create unique index fk_customer_profile_1 on customer_profile (user_id);
 
 drop table api_session;
 create table api_session (
     session_id serial constraint pk_api_session primary key,
-    user_id numeric not null,
-    role text not null,
+    user_id int not null,
+    role text not null, -- redundant (app_user.role)
     permissions text,
     token text not null,
     ip_address text,
@@ -83,13 +87,14 @@ create table api_session (
     expires_in numeric,
     renew_expiration boolean not null
 );
-
-create index ix_customer_1 on api_session (token);
+create index ix_api_session_1 on api_session (token);
 
 drop table sys_call_log;
 create table sys_call_log (
-	call_log_id serial constraint pk_api_log primary key,
+	call_log_id serial constraint pk_call_log primary key,
     transaction_id text not null,
+    user_id int, -- fk, redundant
+    session_id int, -- fk
     url text,
     ip text,
     method text,
@@ -108,11 +113,14 @@ create table sys_call_log (
     updated_dt timestamp not null,
     updated_by text not null
 );
+create index fk_call_log_1 on sys_call_log (user_id);
+create index fk_call_log_2 on sys_call_log (session_id);
 
 drop table sys_error_log;
 create table sys_error_log (
 	error_log_id serial constraint pk_error_log primary key,
-    call_log_id int,
+    user_id int, -- fk, redundant
+    call_log_id int, -- fk
     http_status text,
     http_status_code text,
     exception_class text not null,
@@ -126,11 +134,14 @@ create table sys_error_log (
     updated_dt timestamp not null,
     updated_by text not null
 );
+create index fk_error_log_1 on sys_error_log (user_id);
+create index fk_error_log_2 on sys_error_log (call_log_id);
 
 drop table sys_email_log;
 create table sys_email_log (
-	email_log_id serial constraint pk_smtp_log primary key,
-    call_log_id int,
+	email_log_id serial constraint pk_email_log primary key,
+    call_log_id int, -- fk
+    user_id int, -- fk, redundant
     from_addr text not null,
     to_addr text not null,
     subject text not null,
@@ -142,6 +153,8 @@ create table sys_email_log (
     updated_dt timestamp not null,
     updated_by text not null
 );
+create index fk_email_log_1 on sys_email_log (user_id);
+create index fk_email_log_2 on sys_email_log (call_log_id);
 
 -- functions -- deprecated
 

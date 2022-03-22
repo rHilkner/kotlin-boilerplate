@@ -2,7 +2,7 @@ package com.example.apiboilerplate.models.base
 
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.dtos.auth.SignUpAppAdminRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
 import com.example.apiboilerplate.utils.JsonUtils
 import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.*
@@ -92,9 +92,9 @@ class SysCallLog() : DbAuditable() {
 
         // Blur password field on incoming sign_up requests
         if ("/sign_up".equals(endpoint, ignoreCase = true) && isRequest) {
-            val signUpAppAdminRequestDTO: SignUpAppAdminRequestDTO = objectMapper.readValue(body, SignUpAppAdminRequestDTO::class.java)
-            signUpAppAdminRequestDTO.password = "****"
-            bodyBlurred = objectMapper.writeValueAsString(signUpAppAdminRequestDTO)
+            val signUpAdminRequestDTO: SignUpAdminRequestDTO = objectMapper.readValue(body, SignUpAdminRequestDTO::class.java)
+            signUpAdminRequestDTO.password = "****"
+            bodyBlurred = objectMapper.writeValueAsString(signUpAdminRequestDTO)
         }
 
         return try {

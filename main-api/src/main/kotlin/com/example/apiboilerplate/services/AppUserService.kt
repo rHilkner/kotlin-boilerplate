@@ -4,23 +4,28 @@ import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.converters.ApiSessionConverter
 import com.example.apiboilerplate.converters.AppUserConverter
-import com.example.apiboilerplate.dtos.AppAdminDTO
-import com.example.apiboilerplate.dtos.AppCustomerDTO
-import com.example.apiboilerplate.dtos.AppUserDTO
 import com.example.apiboilerplate.dtos.auth.*
-import com.example.apiboilerplate.enums.*
+import com.example.apiboilerplate.dtos.users.AdminDTO
+import com.example.apiboilerplate.dtos.users.AppUserDTO
+import com.example.apiboilerplate.dtos.users.CustomerDTO
+import com.example.apiboilerplate.enums.AppEmails
+import com.example.apiboilerplate.enums.Permission
+import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.AppAdmin
-import com.example.apiboilerplate.models.AppCustomer
 import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.models.FullUser
 import com.example.apiboilerplate.models.base.ApiSession
-import com.example.apiboilerplate.repositories.AppAdminRepository
-import com.example.apiboilerplate.repositories.AppCustomerRepository
-import com.example.apiboilerplate.services.base.*
+import com.example.apiboilerplate.repositories.AdminProfileRepository
+import com.example.apiboilerplate.repositories.AppUserRepository
+import com.example.apiboilerplate.repositories.CustomerProfileRepository
+import com.example.apiboilerplate.services.base.ApiSessionService
+import com.example.apiboilerplate.services.base.AuthService
+import com.example.apiboilerplate.services.base.EmailService
+import com.example.apiboilerplate.services.base.SecurityService
 import com.example.apiboilerplate.validators.EmailValidator
 import com.example.apiboilerplate.validators.PasswordValidator
+import org.springframework.context.annotation.Lazy
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @Service
@@ -29,11 +34,12 @@ class AppUserService(
     private val passwordValidator: PasswordValidator,
     private val authService: AuthService,
     private val apiSessionService: ApiSessionService,
+    @Lazy
+    private val userProfileService: UserProfileService,
     private val emailService: EmailService,
-    private val appAdminRepository: AppAdminRepository,
-    private val appCustomerRepository: AppCustomerRepository,
-    private val imageService: ImageService,
-    private val storageService: StorageService,
+    private val appUserRepository: AppUserRepository,
+    private val adminProfileRepository: AdminProfileRepository,
+    private val customerProfileRepository: CustomerProfileRepository,
     private val securityService: SecurityService
 ) {
 
@@ -41,6 +47,8 @@ class AppUserService(
 
     private val apiSessionConverter = ApiSessionConverter()
     private val appUserConverter = AppUserConverter()
+
+    /************************ AUTH & HIGH SECURITY ************************/
 
     fun login(loginRequestDTO: LoginRequestDTO, userRole: UserRole): LoginResponseDTO {
         log.info("Login in [${userRole}] user with email [${loginRequestDTO.email}]")
@@ -50,11 +58,13 @@ class AppUserService(
         // Login user
         val apiSession = authService.authenticate(appUser, loginRequestDTO.password)
         appUser.lastLoginDt = Date()
-        val updatedAppUser = saveUser(appUser)
+        val updatedAppUser = saveAppUser(appUser)
+        // Get user with profile
+        val fullUser = userProfileService.getFullUser(updatedAppUser)
 
         // If no error was thrown, return response dto
         log.info("User [${userRole}] logged in successfully with email [${loginRequestDTO.email}]")
-        return this.buildLoginResponseDTO(updatedAppUser, apiSession)
+        return this.buildLoginResponseDTO(fullUser, apiSession)
     }
 
     fun signUp(signUpRequestDTO: SignUpRequestDTO, userRole: UserRole): LoginResponseDTO {
@@ -69,17 +79,24 @@ class AppUserService(
 
         // Create new user
         val passwordHash = authService.encodePassword(signUpRequestDTO.password)
-        var newAppUser = appUserConverter.signUpDtoToAppUser(signUpRequestDTO, passwordHash)
-        newAppUser.signUpDt  = Date()
-        newAppUser = this.saveUser(newAppUser)
-        log.info("New user [${userRole}] was created with email [${newAppUser.email}] and id [${newAppUser.userId}]")
+        var appUser = appUserConverter.signUpDtoToAppUser(signUpRequestDTO, userRole, passwordHash)
+        appUser.signUpDt  = Date()
+        appUser = this.saveAppUser(appUser)
+        log.info("New user [${userRole}] was created with email [${appUser.email}] and id [${appUser.userId}]")
+
+        // Create user profile
+        var userProfile = appUserConverter.signUpDtoToUserProfile(signUpRequestDTO, appUser)
+        userProfile = userProfileService.saveUserProfile(userProfile)
+
+        // Instantiate FullUser object
+        val fullUser = appUserConverter.buildFullUser(appUser, userProfile)
 
         // Authenticate user
-        val apiSession = authService.authenticate(newAppUser, signUpRequestDTO.password)
-        log.info("New user [${userRole}] authenticated with email [${newAppUser.email}] with token [${apiSession.token}]")
+        val apiSession = authService.authenticate(appUser, signUpRequestDTO.password)
+        log.info("New user [${userRole}] authenticated with email [${appUser.email}] with token [${apiSession.token}]")
 
         // If no error was thrown, return response dto
-        return this.buildLoginResponseDTO(newAppUser, apiSession)
+        return this.buildLoginResponseDTO(fullUser, apiSession)
     }
 
     fun forgotPassword(email: String, userRole: UserRole) {
@@ -101,17 +118,17 @@ class AppUserService(
     }
 
     fun resetPassword(resetPasswordRequest: ResetPasswordRequest) {
-        val currentUser = getCurrentUserOrThrow()
+        val appUser = getCurrentUserOrThrow()
 
         // Check if old-password matches current password
-        if (!authService.passwordMatchesEncoded(resetPasswordRequest.oldPassword, currentUser.passwordHash)) {
+        if (!authService.passwordMatchesEncoded(resetPasswordRequest.oldPassword, appUser.passwordHash)) {
             throw ApiExceptionModule.Auth.IncorrectPasswordException()
         }
 
-        log.info("Changing user password with email [${currentUser.email}]")
-        currentUser.passwordHash = authService.encodePassword(resetPasswordRequest.newPassword)
-        this.saveUser(currentUser)
-        log.debug("Changed user password with email [${currentUser.email}]")
+        log.info("Changing user password with email [${appUser.email}]")
+        appUser.passwordHash = authService.encodePassword(resetPasswordRequest.newPassword)
+        this.saveAppUser(appUser)
+        log.debug("Changed user password with email [${appUser.email}]")
     }
 
     fun forceResetPassword(newPassword: String) {
@@ -123,43 +140,30 @@ class AppUserService(
         }
 
         // Change password for user of current session
-        val currentUser = getCurrentUserOrThrow()
-        log.info("Changing user password with email [${currentUser.email}]")
-        currentUser.passwordHash = authService.encodePassword(newPassword)
-        saveUser(currentUser)
-        log.debug("Changed user password with email [${currentUser.email}]")
+        val appUser = getCurrentUserOrThrow()
+        log.info("Changing user password with email [${appUser.email}]")
+        appUser.passwordHash = authService.encodePassword(newPassword)
+        saveAppUser(appUser)
+        log.debug("Changed user password with email [${appUser.email}]")
 
         // Inactivate current session after successful password reset
         apiSessionService.inactivateCurrentSession()
     }
 
-    fun uploadProfileImage(file: MultipartFile) {
-        // Save image to server's internal storage
-        val appUser = this.getCurrentUserOrThrow()
-        log.info("Saving user [${appUser.userId}] profile image")
-        val fileDirectory = AppPaths.getProfileImageDirectory(appUser.userId!!, appUser.role)
-        val fileName = "profile_image.jpg"
-        val optimizedImage = imageService.formatImage(file.bytes, AppImageType.PROFILE)
-        storageService.saveImage(optimizedImage, fileDirectory, fileName)
-
-        // Save profile-image path to user
-        val fullPath = fileDirectory+fileName
-        appUser.profileImagePath = fullPath
-        this.saveUser(appUser)
-        log.debug("User [${appUser.userId}] profile picture saved successfully at [$fullPath]")
-    }
-
-    fun downloadCurrentUserProfileImage(): ByteArray? {
-        val appUser = this.getCurrentUserOrThrow()
-        log.info("Downloading user [${appUser.userId}] profile image")
-        return appUser.profileImagePath?.let { storageService.downloadImage(it) }
-    }
-
-    fun saveUser(appUser: AppUser): AppUser {
-        return when (appUser.role) {
-            UserRole.ADMIN -> appAdminRepository.save(appUser as AppAdmin)
-            UserRole.CUSTOMER -> appCustomerRepository.save(appUser as AppCustomer)
+    private fun buildLoginResponseDTO(user: FullUser, apiSession: ApiSession): LoginResponseDTO {
+        val fullUserDto = appUserConverter.fullUserToFullUserDto(user)
+        val apiSessionDto = apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession)
+        return when (user.appUser.role) {
+            UserRole.ADMIN -> LoginAppAdminResponseDTO(fullUserDto as AdminDTO, apiSessionDto)
+            UserRole.CUSTOMER -> LoginAppCustomerResponseDTO(fullUserDto as CustomerDTO, apiSessionDto)
         }
+    }
+
+    /************************ APP USER ************************/
+
+    fun saveAppUser(appUser: AppUser): AppUser {
+        appUser.lastAccessIp = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
+        return appUserRepository.save(appUser)
     }
 
     fun getCurrentUserOrThrow(): AppUser {
@@ -176,45 +180,31 @@ class AppUserService(
 
         // Check if there is a current user
         val userId = ApiSessionContext.getCurrentApiCallContext().currentUserId ?: return null
-        val userRole = ApiSessionContext.getCurrentApiCallContext().currentUserRole
-            ?: throw ApiExceptionModule.General.UnexpectedException("User role not found")
 
         // Get user from database
-        val appUser = when (userRole) {
-            UserRole.ADMIN -> appAdminRepository.getById(userId)
-            UserRole.CUSTOMER -> appCustomerRepository.getById(userId)
-        }
+        var appUser = appUserRepository.getById(userId)
 
         // Update user last access date
         appUser.lastAccessDt = Date()
-        val updatedAppUser = saveUser(appUser)
-        ApiSessionContext.getCurrentApiCallContext().currentUser = updatedAppUser
+        appUser = saveAppUser(appUser)
+        // Set current-user on api-session-context
+        ApiSessionContext.getCurrentApiCallContext().currentUser = appUser
 
-        log.debug("Current session's user selected from database: [${userRole}] with id [${updatedAppUser.userId}]")
+        log.debug("Current session's user selected from database with role [${appUser.role}] and id [${appUser.userId}]")
 
         return appUser
     }
 
-    fun getUserById(userId: Long, userRole: UserRole): AppUser? {
-        return when (userRole) {
-            UserRole.ADMIN -> appAdminRepository.getById(userId)
-            UserRole.CUSTOMER -> appCustomerRepository.getById(userId)
-        }
-    }
-
-    fun getUserByIdOrThrow(userId: Long, userRole: UserRole): AppUser {
-        return this.getUserById(userId, userRole) ?: throw ApiExceptionModule.User.UserNotFoundException(userId)
+    fun getUserByIdOrThrow(userId: Long): AppUser {
+        return appUserRepository.findById(userId).orElseThrow { throw ApiExceptionModule.User.UserNotFoundException(userId) }
     }
 
     fun getUserByEmail(email: String, userRole: UserRole): AppUser? {
-        return when (userRole) {
-            UserRole.ADMIN -> appAdminRepository.findAppAdminByEmail(email)
-            UserRole.CUSTOMER -> appCustomerRepository.findAppCustomerByEmail(email)
-        }
+        return appUserRepository.findByEmailAndRole(email, userRole)
     }
 
     fun getUserByEmailOrThrow(email: String, userRole: UserRole): AppUser {
-        return this.getUserByEmail(email, userRole) ?: throw ApiExceptionModule.User.UserNotFoundException(email)
+        return appUserRepository.findByEmailAndRole(email, userRole) ?: throw ApiExceptionModule.User.UserNotFoundException(email)
     }
 
     fun getCurrentUserDto(): AppUserDTO? {
@@ -222,24 +212,24 @@ class AppUserService(
     }
 
     fun getUserDtoByEmail(email: String, userRole: UserRole): AppUserDTO? {
-        return this.getUserByEmail(email, userRole)?.let { appUserConverter.appUserToAppUserDto(it) }
+        return appUserRepository.findByEmailAndRole(email, userRole)?.let { appUserConverter.appUserToAppUserDto(it) }
     }
 
     fun updateCurrentUser(newUserDTO: AppUserDTO): AppUserDTO {
-        val currentUser = this.getCurrentUserOrThrow()
+        val appUser = this.getCurrentUserOrThrow()
 
         // Verify if current user is trying to update some user other than himself
-        if (currentUser.userId != newUserDTO.userId) {
-            log.error("User ${currentUser.userId} does not have enough privileges to update user with id ${newUserDTO.userId}")
+        if (appUser.userId != newUserDTO.userId) {
+            log.error("User ${appUser.userId} does not have enough privileges to update user with id ${newUserDTO.userId}")
             throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(
-                "User ${currentUser.userId} does not have enough privileges to update user with id ${newUserDTO.userId}")
+                "User ${appUser.userId} does not have enough privileges to update user with id ${newUserDTO.userId}")
         }
-        return updateUser(currentUser, newUserDTO)
+        return updateUser(appUser, newUserDTO)
     }
 
     fun updateUser(newUserDTO: AppUserDTO): AppUserDTO {
         if (newUserDTO.userId == null) throw ApiExceptionModule.General.NullPointer("userDTO.userId")
-        val appUser = this.getUserByIdOrThrow(newUserDTO.userId!!, newUserDTO.role)
+        val appUser = this.getUserByIdOrThrow(newUserDTO.userId!!)
         return updateUser(appUser, newUserDTO)
     }
 
@@ -247,46 +237,24 @@ class AppUserService(
         securityService.verifyRoleForCurrentUser(userRole)
         log.info("Deleting user [${userRole}] with id [$userId]")
         when (userRole) {
-            UserRole.ADMIN -> appAdminRepository.deleteByAdminId(userId)
-            UserRole.CUSTOMER -> appCustomerRepository.deleteByCustomerId(userId)
+            UserRole.ADMIN -> adminProfileRepository.deleteByAdminProfileId(userId)
+            UserRole.CUSTOMER -> customerProfileRepository.deleteByCustomerProfileId(userId)
         }
     }
 
-    /** Updatable fields are: name (any), email (any), phone (customer), documentId (customer), address (customer),
-     * addressComplement (customer). Any other field that has been modified will be ignored.
+    /** Updatable fields are: name. Any other field that has been modified will be ignored.
      */
-    private fun updateUser(currentAppUser: AppUser, newAppUserDTO: AppUserDTO): AppUserDTO {
+    fun updateUser(currentAppUser: AppUser, newAppUserDTO: AppUserDTO): AppUserDTO {
         log.info("Updating user [${currentAppUser.role}] with id [${newAppUserDTO.userId}]")
 
         // Updating common fields
         currentAppUser.name = newAppUserDTO.name
-        currentAppUser.email = newAppUserDTO.email
-
-        if (currentAppUser.role == UserRole.CUSTOMER) {
-            // Casting user objs as customer objs
-            currentAppUser as AppCustomer
-            newAppUserDTO as AppCustomerDTO
-            // Updating fields
-            currentAppUser.phone = newAppUserDTO.phone
-            currentAppUser.documentId = newAppUserDTO.documentId
-            currentAppUser.address = newAppUserDTO.address
-            currentAppUser.addressComplement = newAppUserDTO.addressComplement
-        }
 
         // Persisting to database
-        val newAppUser = this.saveUser(currentAppUser)
+        val newAppUser = this.saveAppUser(currentAppUser)
         log.info("Successfully updated user [${newAppUser.role}] with id [${newAppUser.userId}]")
         // Returning DTO
         return appUserConverter.appUserToAppUserDto(newAppUser)
-    }
-
-    private fun buildLoginResponseDTO(appUser: AppUser, apiSession: ApiSession): LoginResponseDTO {
-        val apiSessionDto = apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession)
-        val appUserDto = appUserConverter.appUserToAppUserDto(appUser)
-        return when (appUser.role) {
-            UserRole.ADMIN -> LoginAppAdminResponseDTO(appUserDto as AppAdminDTO, apiSessionDto)
-            UserRole.CUSTOMER -> LoginAppCustomerResponseDTO(appUserDto as AppCustomerDTO, apiSessionDto)
-        }
     }
 
 }

@@ -1,46 +1,92 @@
 package com.example.apiboilerplate.converters
 
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.dtos.AppAdminDTO
-import com.example.apiboilerplate.dtos.AppCustomerDTO
-import com.example.apiboilerplate.dtos.AppUserDTO
-import com.example.apiboilerplate.dtos.auth.SignUpAppAdminRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
 import com.example.apiboilerplate.dtos.auth.SignUpAppCustomerRequestDTO
 import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
+import com.example.apiboilerplate.dtos.users.*
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
-import com.example.apiboilerplate.models.AppAdmin
-import com.example.apiboilerplate.models.AppCustomer
-import com.example.apiboilerplate.models.AppUser
+import com.example.apiboilerplate.models.*
 
 class AppUserConverter {
 
     companion object { private val log by ApiLogger() }
 
-    private val appAdminConverter = AppAdminConverter()
-    private val appCustomerConverter = AppCustomerConverter()
+    private val adminConverter = AdminConverter()
+    private val customerConverter = CustomerConverter()
 
-    fun appUserToAppUserDto(appUser: AppUser): AppUserDTO {
-        log.debug("Converting AppUser to AppUserDTO")
+    fun buildFullUser(appUser: AppUser, userProfile: UserProfile): FullUser {
         return when (appUser.role) {
-            UserRole.ADMIN -> AppAdminDTO(appUser as AppAdmin)
-            UserRole.CUSTOMER -> AppCustomerDTO(appUser as AppCustomer)
+            UserRole.CUSTOMER -> Customer(appUser, userProfile as CustomerProfile)
+            UserRole.ADMIN -> Admin(appUser, userProfile as AdminProfile)
         }
     }
 
-    fun signUpDtoToAppUser(signUpRequestDTO: SignUpRequestDTO, passwordHash: String): AppUser {
-        log.debug("Converting SignUpRequestDTO to AppUser")
+    fun fullUserToFullUserDto(fullUser: FullUser): FullUserDTO {
+        return when (fullUser.appUser.role) {
+            UserRole.CUSTOMER -> CustomerDTO(appUserToAppUserDto(fullUser.appUser),
+                userProfileToUserProfileDto(fullUser.userProfile) as CustomerProfileDTO)
+            UserRole.ADMIN -> AdminDTO(appUserToAppUserDto(fullUser.appUser),
+                userProfileToUserProfileDto(fullUser.userProfile) as AdminProfileDTO)
+        }
+    }
+
+    fun appUserToAppUserDto(appUser: AppUser): AppUserDTO {
+        log.debug("Converting AppUser to AppUserDTO")
+        return AppUserDTO(appUser)
+    }
+
+    fun signUpDtoToFullUser(signUpRequestDTO: SignUpRequestDTO, passwordHash: String): FullUser {
         val userRole: UserRole = when (signUpRequestDTO) {
-            is SignUpAppAdminRequestDTO -> UserRole.ADMIN
+            is SignUpAdminRequestDTO -> UserRole.ADMIN
             is SignUpAppCustomerRequestDTO -> UserRole.CUSTOMER
             else -> throw ApiExceptionModule.General.UnexpectedException(
                 "SignUpRequestDTO is not SignUpAppAdminRequestDTO or SignUpAppCustomerRequestDTO")
         }
-        return when (userRole) {
+        val appUser = signUpDtoToAppUser(signUpRequestDTO, userRole, passwordHash)
+        val userProfile = signUpDtoToUserProfile(signUpRequestDTO, appUser)
+        return when (appUser.role) {
+            UserRole.ADMIN -> Admin(appUser, userProfile as AdminProfile)
+            UserRole.CUSTOMER -> Customer(appUser, userProfile as CustomerProfile)
+        }
+    }
+
+    fun signUpDtoToAppUser(signUpRequestDTO: SignUpRequestDTO, userRole: UserRole, passwordHash: String): AppUser {
+        log.debug("Converting SignUpRequestDTO to AppUser")
+        return AppUser(signUpRequestDTO, userRole, passwordHash)
+    }
+
+    fun signUpDtoToUserProfile(signUpRequestDTO: SignUpRequestDTO, appUser: AppUser): UserProfile {
+        return when (appUser.role) {
             UserRole.ADMIN ->
-                appAdminConverter.signUpDtoToAppAdmin(signUpRequestDTO as SignUpAppAdminRequestDTO, passwordHash)
+                adminConverter.signUpDtoToAdminProfile(signUpRequestDTO as SignUpAdminRequestDTO, appUser)
             UserRole.CUSTOMER ->
-                appCustomerConverter.signUpDtoToAppCustomer(signUpRequestDTO as SignUpAppCustomerRequestDTO, passwordHash)
+                customerConverter.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpAppCustomerRequestDTO, appUser)
+        }
+    }
+
+    private fun userProfileToUserProfileDto(userProfile: UserProfile): UserProfileDTO {
+        return when (userProfile) {
+            is AdminProfile -> adminConverter.adminProfileToAdminProfileDto(userProfile)
+            is CustomerProfile -> customerConverter.customerProfileToCustomerProfileDto(userProfile)
+            else -> throw ApiExceptionModule.General.UnexpectedException(
+                "UserProfile is not AdminProfile or CustomerProfile")
+        }
+    }
+
+    fun getUserRole(userProfile: UserProfile): UserRole {
+        return when (userProfile) {
+            is AdminProfile -> UserRole.ADMIN
+            is CustomerProfile -> UserRole.CUSTOMER
+            else -> throw ApiExceptionModule.General.UnexpectedException("UserProfile is not of types AdminProfile or CustomerProfile")
+        }
+    }
+
+    fun buildFullUserDto(appUserDto: AppUserDTO, userProfileDto: UserProfileDTO): FullUserDTO {
+        return when (appUserDto.role) {
+            UserRole.ADMIN -> AdminDTO(appUserDto, userProfileDto as AdminProfileDTO)
+            UserRole.CUSTOMER -> CustomerDTO(appUserDto, userProfileDto as CustomerProfileDTO)
         }
     }
 

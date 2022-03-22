@@ -1,55 +1,35 @@
 package com.example.apiboilerplate.models
 
-import com.example.apiboilerplate.base.ApiSessionContext
+import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.base.DbSoftDelete
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.Convert
-import javax.persistence.MappedSuperclass
+import javax.persistence.*
 
-@MappedSuperclass
-abstract class AppUser: DbSoftDelete() {
+@Entity(name = "AppUser")
+@Table(name = "app_user", schema = "public")
+class AppUser(): DbSoftDelete() {
 
-    val userId: Long?
-        get() {
-            when (this) {
-                is AppCustomer -> {
-                    return this.customerId
-                }
-                is AppAdmin -> {
-                    return this.adminId
-                }
-            }
-            throw RuntimeException()
-        }
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
+    val userId: Long? = null
 
-    @Column(name = "email")
-    lateinit var email: String
+    @Column(name = "user_uuid")
+    lateinit var userUuid: UUID
+
+    @Column(name = "role")
+    lateinit var role: UserRole
 
     @Column(name = "name")
     lateinit var name: String
 
-    @Column(name = "profile_image_path")
-    var profileImagePath: String? = null
+    @Column(name = "email")
+    lateinit var email: String
 
     @Column(name = "password_hash")
     lateinit var passwordHash: String
-
-    val role: UserRole
-        get() {
-            when (this) {
-                is AppCustomer -> {
-                    return UserRole.CUSTOMER
-                }
-                is AppAdmin -> {
-                    return UserRole.ADMIN
-                }
-            }
-            throw RuntimeException()
-        }
-
 
     @Convert(converter = StatusCd.Converter::class)
     @Column(name = "status_cd")
@@ -60,12 +40,18 @@ abstract class AppUser: DbSoftDelete() {
 
     @Column(name = "last_access_ip")
     var lastAccessIp: String? = null
-        get() = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
 
     @Column(name = "last_login_dt")
     var lastLoginDt: Date = Date()
 
     @Column(name = "sign_up_dt")
     var signUpDt: Date = Date()
+
+    constructor(signUpRequestDTO: SignUpRequestDTO, role: UserRole, passwordHash: String) : this() {
+        this.role = role
+        this.email = signUpRequestDTO.email
+        this.name = signUpRequestDTO.name
+        this.passwordHash = passwordHash
+    }
 
 }
