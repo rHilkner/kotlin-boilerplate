@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.converters
+package com.example.apiboilerplate.mappers
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
@@ -6,7 +6,7 @@ import com.example.apiboilerplate.dtos.users.AdminProfileDTO
 import com.example.apiboilerplate.models.user.AdminProfile
 import com.example.apiboilerplate.models.user.AppUser
 
-class AdminConverter {
+class AdminMapper {
 
     companion object { private val log by ApiLogger() }
 

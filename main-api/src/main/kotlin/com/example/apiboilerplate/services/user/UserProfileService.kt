@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.converters.AppUserConverter
+import com.example.apiboilerplate.mappers.AppUserMapper
 import com.example.apiboilerplate.dtos.users.AdminProfileDTO
 import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.dtos.users.FullUserDTO
@@ -22,7 +22,7 @@ class UserProfileService(
 
     companion object { private val log by ApiLogger() }
 
-    private val appUserConverter = AppUserConverter()
+    private val appUserMapper = AppUserMapper()
 
     /************************ USER PROFILE REPOSITORIES (ADMIN AND CUSTOMER) ************************/
 
@@ -34,7 +34,7 @@ class UserProfileService(
     }
 
     fun saveUserProfile(userProfile: UserProfile): UserProfile {
-        return when (appUserConverter.getUserRole(userProfile)) {
+        return when (appUserMapper.getUserRole(userProfile)) {
             UserRole.ADMIN -> adminProfileRepository.save(userProfile as AdminProfile)
             UserRole.CUSTOMER -> customerProfileRepository.save(userProfile as CustomerProfile)
         }
@@ -43,7 +43,7 @@ class UserProfileService(
     /************************ USER PROFILE ************************/
 
     fun updateUserProfile(currentUserProfile: UserProfile, newUserProfile: UserProfileDTO): UserProfileDTO {
-        return when (appUserConverter.getUserRole(currentUserProfile)) {
+        return when (appUserMapper.getUserRole(currentUserProfile)) {
             UserRole.ADMIN -> AdminProfileDTO(currentUserProfile as AdminProfile)
             UserRole.CUSTOMER -> CustomerProfileDTO(currentUserProfile as CustomerProfile)
         }
@@ -58,12 +58,12 @@ class UserProfileService(
 
     fun getCurrentFullUserDtoOrThrow(): FullUserDTO {
         val fullUser = getCurrentFullUserOrThrow()
-        return appUserConverter.fullUserToFullUserDto(fullUser)
+        return appUserMapper.fullUserToFullUserDto(fullUser)
     }
 
     fun getFullUserDto(email: String, role: UserRole): FullUserDTO? {
         val fullUser = getFullUserOrThrow(email, role)
-        return fullUser?.let { appUserConverter.fullUserToFullUserDto(it) }
+        return fullUser?.let { appUserMapper.fullUserToFullUserDto(it) }
     }
 
     fun getFullUserOrThrow(email: String, role: UserRole): FullUser? {
@@ -78,7 +78,7 @@ class UserProfileService(
 
     fun getFullUserOrThrow(appUser: AppUser): FullUser {
         val userProfile = getUserProfile(appUser)
-        return appUserConverter.buildFullUser(appUser, userProfile)
+        return appUserMapper.buildFullUser(appUser, userProfile)
     }
 
     fun updateCurrentUser(newUserDTO: FullUserDTO): FullUserDTO {
@@ -102,7 +102,7 @@ class UserProfileService(
     fun updateUser(currentUser: FullUser, newUserDto: FullUserDTO): FullUserDTO {
         val newAppUser = appUserService.updateUser(currentUser.appUser, newUserDto.appUser)
         val newUserProfile = updateUserProfile(currentUser.userProfile, newUserDto.userProfile)
-        return appUserConverter.buildFullUserDto(newAppUser, newUserProfile)
+        return appUserMapper.buildFullUserDto(newAppUser, newUserProfile)
     }
 
 }

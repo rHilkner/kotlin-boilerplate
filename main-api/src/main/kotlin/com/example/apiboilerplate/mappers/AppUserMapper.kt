@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.converters
+package com.example.apiboilerplate.mappers
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
@@ -10,12 +10,12 @@ import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.user.*
 import java.util.*
 
-class AppUserConverter {
+class AppUserMapper {
 
     companion object { private val log by ApiLogger() }
 
-    private val adminConverter = AdminConverter()
-    private val customerConverter = CustomerConverter()
+    private val adminMapper = AdminMapper()
+    private val customerMapper = CustomerMapper()
 
     fun buildFullUser(appUser: AppUser, userProfile: UserProfile): FullUser {
         return when (appUser.role) {
@@ -46,16 +46,16 @@ class AppUserConverter {
     fun signUpDtoToUserProfile(signUpRequestDTO: SignUpRequestDTO, appUser: AppUser): UserProfile {
         return when (appUser.role) {
             UserRole.ADMIN ->
-                adminConverter.signUpDtoToAdminProfile(signUpRequestDTO as SignUpAdminRequestDTO, appUser)
+                adminMapper.signUpDtoToAdminProfile(signUpRequestDTO as SignUpAdminRequestDTO, appUser)
             UserRole.CUSTOMER ->
-                customerConverter.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpCustomerRequestDTO, appUser)
+                customerMapper.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpCustomerRequestDTO, appUser)
         }
     }
 
     private fun userProfileToUserProfileDto(userProfile: UserProfile): UserProfileDTO {
         return when (userProfile) {
-            is AdminProfile -> adminConverter.adminProfileToAdminProfileDto(userProfile)
-            is CustomerProfile -> customerConverter.customerProfileToCustomerProfileDto(userProfile)
+            is AdminProfile -> adminMapper.adminProfileToAdminProfileDto(userProfile)
+            is CustomerProfile -> customerMapper.customerProfileToCustomerProfileDto(userProfile)
             else -> throw ApiExceptionModule.General.UnexpectedException(
                 "UserProfile is not AdminProfile or CustomerProfile")
         }

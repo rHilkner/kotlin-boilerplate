@@ -1,4 +1,4 @@
-package com.example.apiboilerplate.converters
+package com.example.apiboilerplate.mappers
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.SignUpCustomerRequestDTO
@@ -6,7 +6,7 @@ import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.models.user.AppUser
 import com.example.apiboilerplate.models.user.CustomerProfile
 
-class CustomerConverter {
+class CustomerMapper {
 
     companion object { private val log by ApiLogger() }
 

@@ -1,9 +1,9 @@
-package com.example.apiboilerplate.converters
+package com.example.apiboilerplate.mappers
 
 import com.example.apiboilerplate.dtos.auth.ApiSessionResponseDTO
 import com.example.apiboilerplate.models.base.ApiSession
 
-class ApiSessionConverter {
+class ApiSessionMapper {
 
     fun apiSessionToApiSessionResponseDto(apiSession: ApiSession): ApiSessionResponseDTO {
         return ApiSessionResponseDTO(apiSession)

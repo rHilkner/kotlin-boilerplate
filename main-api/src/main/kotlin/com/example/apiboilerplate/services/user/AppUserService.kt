@@ -2,8 +2,8 @@ package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.converters.ApiSessionConverter
-import com.example.apiboilerplate.converters.AppUserConverter
+import com.example.apiboilerplate.mappers.ApiSessionMapper
+import com.example.apiboilerplate.mappers.AppUserMapper
 import com.example.apiboilerplate.dtos.auth.*
 import com.example.apiboilerplate.dtos.users.AdminDTO
 import com.example.apiboilerplate.dtos.users.AppUserDTO
@@ -41,8 +41,8 @@ class AppUserService(
 
     companion object { private val log by ApiLogger() }
 
-    private val apiSessionConverter = ApiSessionConverter()
-    private val appUserConverter = AppUserConverter()
+    private val apiSessionMapper = ApiSessionMapper()
+    private val appUserMapper = AppUserMapper()
 
     /************************ APP USER REPOSITORY ************************/
 
@@ -90,17 +90,17 @@ class AppUserService(
 
         // Create new user
         val passwordHash = authService.encodePassword(signUpRequestDTO.password)
-        var appUser = appUserConverter.signUpDtoToAppUser(signUpRequestDTO, generateRandomUUID(), userRole, passwordHash)
+        var appUser = appUserMapper.signUpDtoToAppUser(signUpRequestDTO, generateRandomUUID(), userRole, passwordHash)
         appUser.signUpDt  = Date()
         appUser = this.saveAppUser(appUser)
         log.info("New user [${userRole}] was created with email [${appUser.email}] and id [${appUser.userId}]")
 
         // Create user profile
-        var userProfile = appUserConverter.signUpDtoToUserProfile(signUpRequestDTO, appUser)
+        var userProfile = appUserMapper.signUpDtoToUserProfile(signUpRequestDTO, appUser)
         userProfile = userProfileService.saveUserProfile(userProfile)
 
         // Instantiate FullUser object
-        val fullUser = appUserConverter.buildFullUser(appUser, userProfile)
+        val fullUser = appUserMapper.buildFullUser(appUser, userProfile)
 
         // Authenticate user
         val apiSession = authService.authenticate(appUser, signUpRequestDTO.password)
@@ -162,8 +162,8 @@ class AppUserService(
     }
 
     private fun buildLoginResponseDTO(user: FullUser, apiSession: ApiSession): LoginResponseDTO {
-        val fullUserDto = appUserConverter.fullUserToFullUserDto(user)
-        val apiSessionDto = apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession)
+        val fullUserDto = appUserMapper.fullUserToFullUserDto(user)
+        val apiSessionDto = apiSessionMapper.apiSessionToApiSessionResponseDto(apiSession)
         return when (user.appUser.role) {
             UserRole.ADMIN -> LoginAdminResponseDTO(fullUserDto as AdminDTO, apiSessionDto)
             UserRole.CUSTOMER -> LoginCustomerResponseDTO(fullUserDto as CustomerDTO, apiSessionDto)
@@ -210,7 +210,7 @@ class AppUserService(
     }
 
     fun getUserDtoByEmail(email: String, userRole: UserRole): AppUserDTO? {
-        return getUserByEmail(email, userRole)?.let { appUserConverter.appUserToAppUserDto(it) }
+        return getUserByEmail(email, userRole)?.let { appUserMapper.appUserToAppUserDto(it) }
     }
 
     fun deleteUser(userId: Long, userRole: UserRole) {
@@ -237,7 +237,7 @@ class AppUserService(
         val newAppUser = this.saveAppUser(currentAppUser)
         log.info("Successfully updated user [${newAppUser.role}] with id [${newAppUser.userId}]")
         // Returning DTO
-        return appUserConverter.appUserToAppUserDto(newAppUser)
+        return appUserMapper.appUserToAppUserDto(newAppUser)
     }
 
 }
