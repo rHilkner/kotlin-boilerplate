@@ -3,7 +3,7 @@ package com.example.apiboilerplate.services.user
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.LoginCustomerResponseDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
-import com.example.apiboilerplate.dtos.auth.SignUpCustomerRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.dtos.users.CustomerDTO
 import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.enums.AppImageType
@@ -31,8 +31,8 @@ class CustomerService(
         return appUserService.login(loginRequestDTO, UserRole.CUSTOMER) as LoginCustomerResponseDTO
     }
 
-    fun signUp(signUpCustomerRequestDTO: SignUpCustomerRequestDTO): LoginCustomerResponseDTO {
-        return appUserService.signUp(signUpCustomerRequestDTO, UserRole.CUSTOMER) as LoginCustomerResponseDTO
+    fun signUp(signUpRequestDTO: SignUpRequestDTO): LoginCustomerResponseDTO {
+        return appUserService.signUp(signUpRequestDTO, UserRole.CUSTOMER) as LoginCustomerResponseDTO
     }
 
     fun getCurrentCustomerDto(): CustomerDTO {

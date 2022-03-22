@@ -3,7 +3,7 @@ package com.example.apiboilerplate.dtos.auth
 import com.fasterxml.jackson.annotation.JsonProperty
 import javax.validation.constraints.NotNull
 
-abstract class SignUpRequestDTO(
+class SignUpRequestDTO(
 
     @JsonProperty("email")
     @NotNull(message = "Email should not be null")

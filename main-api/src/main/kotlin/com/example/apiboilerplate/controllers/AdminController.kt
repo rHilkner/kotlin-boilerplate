@@ -38,8 +38,8 @@ class AdminController(
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid signUpAdminRequestDTO: SignUpAdminRequestDTO): ResponseEntity<ResponsePayload<LoginAdminResponseDTO>> {
-        return response(adminService.signUp(signUpAdminRequestDTO), HttpStatus.OK)
+    fun signUp(@RequestBody @Valid signUpRequestDTO: SignUpRequestDTO): ResponseEntity<ResponsePayload<LoginAdminResponseDTO>> {
+        return response(adminService.signUp(signUpRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")

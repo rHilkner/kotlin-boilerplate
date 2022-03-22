@@ -35,8 +35,8 @@ class CustomerController(
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid signUpCustomerRequestDTO: SignUpCustomerRequestDTO): ResponseEntity<ResponsePayload<LoginCustomerResponseDTO>> {
-        return response(customerService.signUp(signUpCustomerRequestDTO), HttpStatus.OK)
+    fun signUp(@RequestBody @Valid signUpRequestDTO: SignUpRequestDTO): ResponseEntity<ResponsePayload<LoginCustomerResponseDTO>> {
+        return response(customerService.signUp(signUpRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")

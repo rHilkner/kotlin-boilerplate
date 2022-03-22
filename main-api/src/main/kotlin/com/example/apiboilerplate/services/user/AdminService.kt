@@ -3,7 +3,7 @@ package com.example.apiboilerplate.services.user
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.LoginAdminResponseDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
-import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.dtos.users.AdminDTO
 import com.example.apiboilerplate.enums.UserRole
 import org.springframework.stereotype.Service
@@ -22,8 +22,8 @@ class AdminService(
         return appUserService.login(loginRequestDTO, UserRole.ADMIN) as LoginAdminResponseDTO
     }
 
-    fun signUp(signUpAdminRequestDTO: SignUpAdminRequestDTO): LoginAdminResponseDTO {
-        return appUserService.signUp(signUpAdminRequestDTO, UserRole.ADMIN) as LoginAdminResponseDTO
+    fun signUp(signUpRequestDTO: SignUpRequestDTO): LoginAdminResponseDTO {
+        return appUserService.signUp(signUpRequestDTO, UserRole.ADMIN) as LoginAdminResponseDTO
     }
 
     /************************ CRUD ************************/

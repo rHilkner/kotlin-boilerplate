@@ -2,8 +2,6 @@ package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.ApiSessionContext
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.mappers.ApiSessionMapper
-import com.example.apiboilerplate.mappers.AppUserMapper
 import com.example.apiboilerplate.dtos.auth.*
 import com.example.apiboilerplate.dtos.users.AdminDTO
 import com.example.apiboilerplate.dtos.users.AppUserDTO
@@ -12,6 +10,8 @@ import com.example.apiboilerplate.enums.AppEmails
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
+import com.example.apiboilerplate.mappers.ApiSessionMapper
+import com.example.apiboilerplate.mappers.AppUserMapper
 import com.example.apiboilerplate.models.base.ApiSession
 import com.example.apiboilerplate.models.user.AppUser
 import com.example.apiboilerplate.models.user.FullUser

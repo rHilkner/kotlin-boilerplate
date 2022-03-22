@@ -1,8 +1,6 @@
 package com.example.apiboilerplate.mappers
 
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
-import com.example.apiboilerplate.dtos.auth.SignUpCustomerRequestDTO
 import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.dtos.users.*
 import com.example.apiboilerplate.enums.UserRole
@@ -46,9 +44,9 @@ class AppUserMapper {
     fun signUpDtoToUserProfile(signUpRequestDTO: SignUpRequestDTO, appUser: AppUser): UserProfile {
         return when (appUser.role) {
             UserRole.ADMIN ->
-                adminMapper.signUpDtoToAdminProfile(signUpRequestDTO as SignUpAdminRequestDTO, appUser)
+                adminMapper.signUpDtoToAdminProfile(signUpRequestDTO as SignUpRequestDTO, appUser)
             UserRole.CUSTOMER ->
-                customerMapper.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpCustomerRequestDTO, appUser)
+                customerMapper.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpRequestDTO, appUser)
         }
     }
 

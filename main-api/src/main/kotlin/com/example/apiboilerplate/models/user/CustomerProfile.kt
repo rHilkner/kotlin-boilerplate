@@ -1,6 +1,5 @@
 package com.example.apiboilerplate.models.user
 
-import com.example.apiboilerplate.dtos.auth.SignUpCustomerRequestDTO
 import javax.persistence.*
 
 
@@ -29,12 +28,8 @@ class CustomerProfile: UserProfile {
     var profileImagePath: String? = null
 
     constructor()
-    constructor(dto: SignUpCustomerRequestDTO, appUser: AppUser) {
+    constructor(appUser: AppUser) {
         this.userId = appUser.userId!!
-        this.phone = dto.phone
-        this.documentId = dto.documentId
-        this.address = dto.address
-        this.addressComplement = dto.addressComplement
     }
 
 }

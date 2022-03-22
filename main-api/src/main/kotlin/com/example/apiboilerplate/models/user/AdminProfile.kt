@@ -1,6 +1,5 @@
 package com.example.apiboilerplate.models.user
 
-import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
 import javax.persistence.*
 
 @Entity(name = "AdminProfile")
@@ -22,7 +21,5 @@ class AdminProfile(): UserProfile() {
     constructor(appUser: AppUser, dbWritePermission: Boolean) : this(appUser) {
         this.dbWritePermission = dbWritePermission
     }
-
-    constructor(appUser: AppUser, signUpDto: SignUpAdminRequestDTO) : this(appUser)
 
 }
