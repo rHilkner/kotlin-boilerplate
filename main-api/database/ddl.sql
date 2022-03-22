@@ -14,7 +14,7 @@ drop table app_user;
 create table app_user (
     -- User common columns
     user_id serial constraint pk_user primary key,
-    user_uuid text not null,
+    user_uuid uuid not null,
     role text not null,
     name text not null,
     email text not null,

@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository
 interface AdminProfileRepository: JpaRepository<AdminProfile, Long> {
 
     fun findByUserId(userId: Long): AdminProfile?
-    fun deleteByAdminProfileId(adminProfileId: Long)
 
 }

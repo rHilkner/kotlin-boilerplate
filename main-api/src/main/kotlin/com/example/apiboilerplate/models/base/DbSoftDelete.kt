@@ -8,12 +8,12 @@ import javax.persistence.MappedSuperclass
 abstract class DbSoftDelete: DbAuditable() {
 
     @Column(name = "deleted_status")
-    val deletedStatus = false
+    var deletedStatus = false
 
     @Column(name = "deleted_dt")
-    val deletedDt: Date? = null
+    var deletedDt: Date? = null
 
     @Column(name = "deleted_by")
-    val deletedBy: String? = null
+    var deletedBy: String? = null
 
 }

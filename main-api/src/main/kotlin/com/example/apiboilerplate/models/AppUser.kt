@@ -19,6 +19,7 @@ class AppUser(): DbSoftDelete() {
     @Column(name = "user_uuid")
     lateinit var userUuid: UUID
 
+    @Convert(converter = UserRole.Converter::class)
     @Column(name = "role")
     lateinit var role: UserRole
 
@@ -47,7 +48,8 @@ class AppUser(): DbSoftDelete() {
     @Column(name = "sign_up_dt")
     var signUpDt: Date = Date()
 
-    constructor(signUpRequestDTO: SignUpRequestDTO, role: UserRole, passwordHash: String) : this() {
+    constructor(signUpRequestDTO: SignUpRequestDTO, uuid: UUID, role: UserRole, passwordHash: String) : this() {
+        this.userUuid = uuid
         this.role = role
         this.email = signUpRequestDTO.email
         this.name = signUpRequestDTO.name

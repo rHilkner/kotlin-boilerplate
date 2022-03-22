@@ -15,9 +15,7 @@ import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.AppUser
 import com.example.apiboilerplate.models.FullUser
 import com.example.apiboilerplate.models.base.ApiSession
-import com.example.apiboilerplate.repositories.AdminProfileRepository
 import com.example.apiboilerplate.repositories.AppUserRepository
-import com.example.apiboilerplate.repositories.CustomerProfileRepository
 import com.example.apiboilerplate.services.base.ApiSessionService
 import com.example.apiboilerplate.services.base.AuthService
 import com.example.apiboilerplate.services.base.EmailService
@@ -38,8 +36,6 @@ class AppUserService(
     private val userProfileService: UserProfileService,
     private val emailService: EmailService,
     private val appUserRepository: AppUserRepository,
-    private val adminProfileRepository: AdminProfileRepository,
-    private val customerProfileRepository: CustomerProfileRepository,
     private val securityService: SecurityService
 ) {
 
@@ -47,6 +43,21 @@ class AppUserService(
 
     private val apiSessionConverter = ApiSessionConverter()
     private val appUserConverter = AppUserConverter()
+
+    /************************ APP USER REPOSITORY ************************/
+
+    fun saveAppUser(appUser: AppUser): AppUser {
+        appUser.lastAccessIp = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
+        return appUserRepository.save(appUser)
+    }
+
+    fun getUserByIdOrThrow(userId: Long): AppUser {
+        return appUserRepository.findByUserIdAndDeletedStatusFalse(userId) ?: throw ApiExceptionModule.User.UserNotFoundException(userId)
+    }
+
+    fun getUserByEmail(email: String, userRole: UserRole): AppUser? {
+        return appUserRepository.findByEmailAndRoleAndDeletedStatusFalse(email, userRole)
+    }
 
     /************************ AUTH & HIGH SECURITY ************************/
 
@@ -79,7 +90,7 @@ class AppUserService(
 
         // Create new user
         val passwordHash = authService.encodePassword(signUpRequestDTO.password)
-        var appUser = appUserConverter.signUpDtoToAppUser(signUpRequestDTO, userRole, passwordHash)
+        var appUser = appUserConverter.signUpDtoToAppUser(signUpRequestDTO, generateRandomUUID(), userRole, passwordHash)
         appUser.signUpDt  = Date()
         appUser = this.saveAppUser(appUser)
         log.info("New user [${userRole}] was created with email [${appUser.email}] and id [${appUser.userId}]")
@@ -159,12 +170,11 @@ class AppUserService(
         }
     }
 
-    /************************ APP USER ************************/
-
-    fun saveAppUser(appUser: AppUser): AppUser {
-        appUser.lastAccessIp = ApiSessionContext.getCurrentApiCallContext().request.wrapperIpAddress
-        return appUserRepository.save(appUser)
+    private fun generateRandomUUID(): UUID {
+        return UUID.randomUUID()
     }
+
+    /************************ APP USER ************************/
 
     fun getCurrentUserOrThrow(): AppUser {
         return getCurrentUser() ?: throw ApiExceptionModule.General.NullPointer("Current session user is null")
@@ -182,7 +192,7 @@ class AppUserService(
         val userId = ApiSessionContext.getCurrentApiCallContext().currentUserId ?: return null
 
         // Get user from database
-        var appUser = appUserRepository.getById(userId)
+        var appUser = getUserByIdOrThrow(userId)
 
         // Update user last access date
         appUser.lastAccessDt = Date()
@@ -195,51 +205,24 @@ class AppUserService(
         return appUser
     }
 
-    fun getUserByIdOrThrow(userId: Long): AppUser {
-        return appUserRepository.findById(userId).orElseThrow { throw ApiExceptionModule.User.UserNotFoundException(userId) }
-    }
-
-    fun getUserByEmail(email: String, userRole: UserRole): AppUser? {
-        return appUserRepository.findByEmailAndRole(email, userRole)
-    }
-
     fun getUserByEmailOrThrow(email: String, userRole: UserRole): AppUser {
-        return appUserRepository.findByEmailAndRole(email, userRole) ?: throw ApiExceptionModule.User.UserNotFoundException(email)
-    }
-
-    fun getCurrentUserDto(): AppUserDTO? {
-        return this.getCurrentUser()?.let { appUserConverter.appUserToAppUserDto(it) }
+        return getUserByEmail(email, userRole) ?: throw ApiExceptionModule.User.UserNotFoundException(email)
     }
 
     fun getUserDtoByEmail(email: String, userRole: UserRole): AppUserDTO? {
-        return appUserRepository.findByEmailAndRole(email, userRole)?.let { appUserConverter.appUserToAppUserDto(it) }
-    }
-
-    fun updateCurrentUser(newUserDTO: AppUserDTO): AppUserDTO {
-        val appUser = this.getCurrentUserOrThrow()
-
-        // Verify if current user is trying to update some user other than himself
-        if (appUser.userId != newUserDTO.userId) {
-            log.error("User ${appUser.userId} does not have enough privileges to update user with id ${newUserDTO.userId}")
-            throw ApiExceptionModule.Auth.NotEnoughPrivilegesException(
-                "User ${appUser.userId} does not have enough privileges to update user with id ${newUserDTO.userId}")
-        }
-        return updateUser(appUser, newUserDTO)
-    }
-
-    fun updateUser(newUserDTO: AppUserDTO): AppUserDTO {
-        if (newUserDTO.userId == null) throw ApiExceptionModule.General.NullPointer("userDTO.userId")
-        val appUser = this.getUserByIdOrThrow(newUserDTO.userId!!)
-        return updateUser(appUser, newUserDTO)
+        return getUserByEmail(email, userRole)?.let { appUserConverter.appUserToAppUserDto(it) }
     }
 
     fun deleteUser(userId: Long, userRole: UserRole) {
         securityService.verifyRoleForCurrentUser(userRole)
         log.info("Deleting user [${userRole}] with id [$userId]")
-        when (userRole) {
-            UserRole.ADMIN -> adminProfileRepository.deleteByAdminProfileId(userId)
-            UserRole.CUSTOMER -> customerProfileRepository.deleteByCustomerProfileId(userId)
-        }
+        val appUser = getUserByIdOrThrow(userId)
+
+        appUser.deletedStatus = true
+        appUser.deletedBy = getCurrentUserOrThrow().userId.toString()
+        appUser.deletedDt = Date()
+
+        saveAppUser(appUser)
     }
 
     /** Updatable fields are: name. Any other field that has been modified will be ignored.

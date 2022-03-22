@@ -24,6 +24,22 @@ class UserProfileService(
 
     private val appUserConverter = AppUserConverter()
 
+    /************************ USER PROFILE REPOSITORIES (ADMIN AND CUSTOMER) ************************/
+
+    fun getUserProfile(appUser: AppUser): UserProfile {
+        return when (appUser.role) {
+            UserRole.ADMIN -> adminProfileRepository.findByUserId(appUser.userId!!)!!
+            UserRole.CUSTOMER -> customerProfileRepository.findByUserId(appUser.userId!!)!!
+        }
+    }
+
+    fun saveUserProfile(userProfile: UserProfile): UserProfile {
+        return when (appUserConverter.getUserRole(userProfile)) {
+            UserRole.ADMIN -> adminProfileRepository.save(userProfile as AdminProfile)
+            UserRole.CUSTOMER -> customerProfileRepository.save(userProfile as CustomerProfile)
+        }
+    }
+
     /************************ FULL USER ************************/
 
     fun getCurrentFullUserOrThrow(): FullUser {
@@ -77,23 +93,9 @@ class UserProfileService(
 
     /************************ USER PROFILE ************************/
 
-    fun getUserProfile(appUser: AppUser): UserProfile {
-        return when (appUser.role) {
-            UserRole.ADMIN -> adminProfileRepository.findByUserId(appUser.userId!!)!!
-            UserRole.CUSTOMER -> customerProfileRepository.findByUserId(appUser.userId!!)!!
-        }
-    }
-
-    fun saveUserProfile(userProfile: UserProfile): UserProfile {
-        return when (appUserConverter.getUserRole(userProfile)) {
-            UserRole.ADMIN -> adminProfileRepository.save(userProfile as AdminProfile)
-            UserRole.CUSTOMER -> customerProfileRepository.save(userProfile as CustomerProfile)
-        }
-    }
-
     fun updateUser(currentUser: FullUser, newUserDto: FullUserDTO): FullUserDTO {
-        val newUserProfile = updateUserProfile(currentUser.userProfile, newUserDto.userProfile)
         val newAppUser = appUserService.updateUser(currentUser.appUser, newUserDto.appUser)
+        val newUserProfile = updateUserProfile(currentUser.userProfile, newUserDto.userProfile)
         return appUserConverter.buildFullUserDto(newAppUser, newUserProfile)
     }
 

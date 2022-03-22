@@ -8,6 +8,7 @@ import com.example.apiboilerplate.dtos.users.*
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.models.*
+import java.util.*
 
 class AppUserConverter {
 
@@ -37,24 +38,9 @@ class AppUserConverter {
         return AppUserDTO(appUser)
     }
 
-    fun signUpDtoToFullUser(signUpRequestDTO: SignUpRequestDTO, passwordHash: String): FullUser {
-        val userRole: UserRole = when (signUpRequestDTO) {
-            is SignUpAdminRequestDTO -> UserRole.ADMIN
-            is SignUpAppCustomerRequestDTO -> UserRole.CUSTOMER
-            else -> throw ApiExceptionModule.General.UnexpectedException(
-                "SignUpRequestDTO is not SignUpAppAdminRequestDTO or SignUpAppCustomerRequestDTO")
-        }
-        val appUser = signUpDtoToAppUser(signUpRequestDTO, userRole, passwordHash)
-        val userProfile = signUpDtoToUserProfile(signUpRequestDTO, appUser)
-        return when (appUser.role) {
-            UserRole.ADMIN -> Admin(appUser, userProfile as AdminProfile)
-            UserRole.CUSTOMER -> Customer(appUser, userProfile as CustomerProfile)
-        }
-    }
-
-    fun signUpDtoToAppUser(signUpRequestDTO: SignUpRequestDTO, userRole: UserRole, passwordHash: String): AppUser {
+    fun signUpDtoToAppUser(signUpRequestDTO: SignUpRequestDTO, uuid: UUID, userRole: UserRole, passwordHash: String): AppUser {
         log.debug("Converting SignUpRequestDTO to AppUser")
-        return AppUser(signUpRequestDTO, userRole, passwordHash)
+        return AppUser(signUpRequestDTO, uuid, userRole, passwordHash)
     }
 
     fun signUpDtoToUserProfile(signUpRequestDTO: SignUpRequestDTO, appUser: AppUser): UserProfile {

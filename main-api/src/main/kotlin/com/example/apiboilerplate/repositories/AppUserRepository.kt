@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AppUserRepository: JpaRepository<AppUser, Long> {
 
-    fun findByEmailAndRole(email: String, role: UserRole): AppUser?
+    fun findByUserIdAndDeletedStatusFalse(userId: Long): AppUser?
+    fun findByEmailAndRoleAndDeletedStatusFalse(email: String, role: UserRole): AppUser?
 
 }
