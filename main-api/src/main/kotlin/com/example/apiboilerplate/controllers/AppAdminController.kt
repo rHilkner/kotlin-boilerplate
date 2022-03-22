@@ -21,7 +21,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/admin")
-class AppAdminController(
+class AdminController(
     private val appUserService: AppUserService,
     private val adminService: AdminService,
     private val customerService: CustomerService,
@@ -32,13 +32,13 @@ class AppAdminController(
 
     @PostMapping("/login")
     @Transactional
-    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
+    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAdminResponseDTO>> {
         return response(adminService.login(loginRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid signUpAdminRequestDTO: SignUpAdminRequestDTO): ResponseEntity<ResponsePayload<LoginAppAdminResponseDTO>> {
+    fun signUp(@RequestBody @Valid signUpAdminRequestDTO: SignUpAdminRequestDTO): ResponseEntity<ResponsePayload<LoginAdminResponseDTO>> {
         return response(adminService.signUp(signUpAdminRequestDTO), HttpStatus.OK)
     }
 

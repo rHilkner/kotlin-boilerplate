@@ -2,7 +2,7 @@ package com.example.apiboilerplate.converters
 
 import com.example.apiboilerplate.base.logger.ApiLogger
 import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
-import com.example.apiboilerplate.dtos.auth.SignUpAppCustomerRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpCustomerRequestDTO
 import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.dtos.users.*
 import com.example.apiboilerplate.enums.UserRole
@@ -48,7 +48,7 @@ class AppUserConverter {
             UserRole.ADMIN ->
                 adminConverter.signUpDtoToAdminProfile(signUpRequestDTO as SignUpAdminRequestDTO, appUser)
             UserRole.CUSTOMER ->
-                customerConverter.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpAppCustomerRequestDTO, appUser)
+                customerConverter.signUpDtoToCustomerProfile(signUpRequestDTO as SignUpCustomerRequestDTO, appUser)
         }
     }
 

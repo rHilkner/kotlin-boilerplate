@@ -2,7 +2,7 @@ package com.example.apiboilerplate.dtos.auth
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class SignUpAppCustomerRequestDTO(
+class SignUpCustomerRequestDTO(
 
     email: String,
     name: String,

@@ -1,7 +1,7 @@
 package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.dtos.auth.LoginAppAdminResponseDTO
+import com.example.apiboilerplate.dtos.auth.LoginAdminResponseDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
 import com.example.apiboilerplate.dtos.auth.SignUpAdminRequestDTO
 import com.example.apiboilerplate.dtos.users.AdminDTO
@@ -18,12 +18,12 @@ class AdminService(
 
     /************************ AUTH & HIGH SECURITY ************************/
 
-    fun login(loginRequestDTO: LoginRequestDTO): LoginAppAdminResponseDTO {
-        return appUserService.login(loginRequestDTO, UserRole.ADMIN) as LoginAppAdminResponseDTO
+    fun login(loginRequestDTO: LoginRequestDTO): LoginAdminResponseDTO {
+        return appUserService.login(loginRequestDTO, UserRole.ADMIN) as LoginAdminResponseDTO
     }
 
-    fun signUp(signUpAdminRequestDTO: SignUpAdminRequestDTO): LoginAppAdminResponseDTO {
-        return appUserService.signUp(signUpAdminRequestDTO, UserRole.ADMIN) as LoginAppAdminResponseDTO
+    fun signUp(signUpAdminRequestDTO: SignUpAdminRequestDTO): LoginAdminResponseDTO {
+        return appUserService.signUp(signUpAdminRequestDTO, UserRole.ADMIN) as LoginAdminResponseDTO
     }
 
     /************************ CRUD ************************/

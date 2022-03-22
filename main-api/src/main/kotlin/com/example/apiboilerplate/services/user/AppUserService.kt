@@ -165,8 +165,8 @@ class AppUserService(
         val fullUserDto = appUserConverter.fullUserToFullUserDto(user)
         val apiSessionDto = apiSessionConverter.apiSessionToApiSessionResponseDto(apiSession)
         return when (user.appUser.role) {
-            UserRole.ADMIN -> LoginAppAdminResponseDTO(fullUserDto as AdminDTO, apiSessionDto)
-            UserRole.CUSTOMER -> LoginAppCustomerResponseDTO(fullUserDto as CustomerDTO, apiSessionDto)
+            UserRole.ADMIN -> LoginAdminResponseDTO(fullUserDto as AdminDTO, apiSessionDto)
+            UserRole.CUSTOMER -> LoginCustomerResponseDTO(fullUserDto as CustomerDTO, apiSessionDto)
         }
     }
 

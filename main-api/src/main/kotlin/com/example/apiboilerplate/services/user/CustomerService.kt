@@ -1,9 +1,9 @@
 package com.example.apiboilerplate.services.user
 
 import com.example.apiboilerplate.base.logger.ApiLogger
-import com.example.apiboilerplate.dtos.auth.LoginAppCustomerResponseDTO
+import com.example.apiboilerplate.dtos.auth.LoginCustomerResponseDTO
 import com.example.apiboilerplate.dtos.auth.LoginRequestDTO
-import com.example.apiboilerplate.dtos.auth.SignUpAppCustomerRequestDTO
+import com.example.apiboilerplate.dtos.auth.SignUpCustomerRequestDTO
 import com.example.apiboilerplate.dtos.users.CustomerDTO
 import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.enums.AppImageType
@@ -27,12 +27,12 @@ class CustomerService(
 
     /************************ AUTH & HIGH SECURITY ************************/
 
-    fun login(loginRequestDTO: LoginRequestDTO): LoginAppCustomerResponseDTO {
-        return appUserService.login(loginRequestDTO, UserRole.CUSTOMER) as LoginAppCustomerResponseDTO
+    fun login(loginRequestDTO: LoginRequestDTO): LoginCustomerResponseDTO {
+        return appUserService.login(loginRequestDTO, UserRole.CUSTOMER) as LoginCustomerResponseDTO
     }
 
-    fun signUp(signUpAppCustomerRequestDTO: SignUpAppCustomerRequestDTO): LoginAppCustomerResponseDTO {
-        return appUserService.signUp(signUpAppCustomerRequestDTO, UserRole.CUSTOMER) as LoginAppCustomerResponseDTO
+    fun signUp(signUpCustomerRequestDTO: SignUpCustomerRequestDTO): LoginCustomerResponseDTO {
+        return appUserService.signUp(signUpCustomerRequestDTO, UserRole.CUSTOMER) as LoginCustomerResponseDTO
     }
 
     fun getCurrentCustomerDto(): CustomerDTO {

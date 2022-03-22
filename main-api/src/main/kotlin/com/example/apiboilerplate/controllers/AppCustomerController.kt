@@ -20,7 +20,7 @@ import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/customer")
-class AppCustomerController(
+class CustomerController(
     private val customerService: CustomerService,
     private val appUserService: AppUserService
 ): AbstractController() {
@@ -29,14 +29,14 @@ class AppCustomerController(
 
     @PostMapping("/login")
     @Transactional
-    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginAppCustomerResponseDTO>> {
+    fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginCustomerResponseDTO>> {
         return response(customerService.login(loginRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
-    fun signUp(@RequestBody @Valid signUpAppCustomerRequestDTO: SignUpAppCustomerRequestDTO): ResponseEntity<ResponsePayload<LoginAppCustomerResponseDTO>> {
-        return response(customerService.signUp(signUpAppCustomerRequestDTO), HttpStatus.OK)
+    fun signUp(@RequestBody @Valid signUpCustomerRequestDTO: SignUpCustomerRequestDTO): ResponseEntity<ResponsePayload<LoginCustomerResponseDTO>> {
+        return response(customerService.signUp(signUpCustomerRequestDTO), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")
