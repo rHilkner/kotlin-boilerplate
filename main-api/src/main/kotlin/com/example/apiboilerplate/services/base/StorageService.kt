@@ -23,11 +23,12 @@ class StorageService(
         return imageBytes
     }
 
-    fun saveImage(imageBytes: ByteArray, directory: String, fileName: String) {
+    fun saveImage(imageBytes: ByteArray, directory: String, fileName: String): String {
         fileValidator.fileNotEmpty(imageBytes)
         fileValidator.imageFile(imageBytes)
         storagePermissionsValidator.checkCurrentUserWritePermissions(directory)
         saveFile(imageBytes, directory, fileName)
+        return directory + fileName
     }
 
     private fun saveFile(fileBytes: ByteArray, directory: String, fileName: String) {

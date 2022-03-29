@@ -3,10 +3,10 @@ package com.example.apiboilerplate.mappers
 import com.example.apiboilerplate.dtos.auth.ApiSessionResponseDTO
 import com.example.apiboilerplate.models.base.ApiSession
 
-class ApiSessionMapper {
+class ApiSessionMapper: IMapper<ApiSession, ApiSessionResponseDTO> {
 
-    fun apiSessionToApiSessionResponseDto(apiSession: ApiSession): ApiSessionResponseDTO {
-        return ApiSessionResponseDTO(apiSession)
+    override fun toDto(model: ApiSession): ApiSessionResponseDTO {
+        return ApiSessionResponseDTO(model)
     }
 
 }

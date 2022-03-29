@@ -25,7 +25,7 @@ class EmailValidator(
 
     fun emailNotAlreadyUsed(email: String, userRole: UserRole) {
         // Try to find user with email
-        val appUser = appUserService.getUserByEmail(email, userRole)
+        val appUser = appUserService.getByEmail(email, userRole)
         // If user found, throw exception
         if (appUser != null) {
             throw ApiExceptionModule.Auth.EmailAlreadyUsedException(email)

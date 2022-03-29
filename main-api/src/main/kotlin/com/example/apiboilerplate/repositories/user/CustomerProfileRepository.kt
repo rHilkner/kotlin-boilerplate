@@ -8,6 +8,5 @@ import org.springframework.stereotype.Repository
 interface CustomerProfileRepository: JpaRepository<CustomerProfile, Long> {
 
     fun findByUserId(userId: Long) : CustomerProfile?
-    fun deleteByCustomerProfileId(customerProfileId: Long)
 
 }

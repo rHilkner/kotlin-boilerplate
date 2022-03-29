@@ -3,8 +3,8 @@ package com.example.apiboilerplate.models.user
 import javax.persistence.*
 
 @Entity(name = "AdminProfile")
-@Table(name = "admin_profile", schema = "public")
-class AdminProfile(): UserProfile() {
+@Table(name = "user_admin_profile", schema = "public")
+class AdminProfile(): BaseUserProfile() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

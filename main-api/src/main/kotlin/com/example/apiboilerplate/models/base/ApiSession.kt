@@ -66,7 +66,7 @@ class ApiSession() {
     @Column(name = "token")
     lateinit var token: String
 
-    /** IP Address used to create permission */
+    /** IP Address.kt used to create permission */
     @Column(name = "ip_address")
     lateinit var ipAddress: String
 

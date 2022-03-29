@@ -4,8 +4,8 @@ import javax.persistence.*
 
 
 @Entity(name = "CustomerProfile")
-@Table(name = "customer_profile", schema = "public")
-class CustomerProfile: UserProfile {
+@Table(name = "user_customer_profile", schema = "public")
+class CustomerProfile(): BaseUserProfileWithImage() {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,17 +18,7 @@ class CustomerProfile: UserProfile {
     @Column(name = "document_id")
     var documentId: String? = null
 
-    @Column(name = "address")
-    var address: String? = null
-
-    @Column(name = "address_complement")
-    var addressComplement: String? = null
-
-    @Column(name = "profile_image_path")
-    var profileImagePath: String? = null
-
-    constructor()
-    constructor(appUser: AppUser) {
+    constructor(appUser: AppUser) : this() {
         this.userId = appUser.userId!!
     }
 

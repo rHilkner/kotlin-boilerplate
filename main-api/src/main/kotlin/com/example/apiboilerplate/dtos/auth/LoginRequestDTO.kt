@@ -1,5 +1,6 @@
 package com.example.apiboilerplate.dtos.auth
 
+import com.example.apiboilerplate.dtos.IAppDTO
 import com.fasterxml.jackson.annotation.JsonProperty
 import javax.validation.constraints.NotNull
 
@@ -13,4 +14,4 @@ class LoginRequestDTO(
     @NotNull(message = "Password should not be null")
     var password: String
 
-)
+): IAppDTO

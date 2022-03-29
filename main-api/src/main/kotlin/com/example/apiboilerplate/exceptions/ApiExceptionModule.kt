@@ -3,6 +3,7 @@ package com.example.apiboilerplate.exceptions
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
 import org.springframework.http.HttpStatus
+import java.util.*
 
 class ApiExceptionModule {
 
@@ -13,13 +14,16 @@ class ApiExceptionModule {
             : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
         class BadRequestException(errorMessage: String, debugMessage: String = errorMessage)
             : ApiException(HttpStatus.BAD_REQUEST, errorMessage, debugMessage)
+        class NotImplementedException(errorMessage: String, debugMessage: String = errorMessage)
+            : ApiException(HttpStatus.INTERNAL_SERVER_ERROR, errorMessage, debugMessage)
     }
 
     class Auth {
         class UnauthenticatedCallException
             : ApiException(HttpStatus.UNAUTHORIZED, "Unauthorized session for method", "")
         class NotEnoughPrivilegesException: ApiException {
-            constructor(sessionRole: UserRole?, endpoint: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges (insufficient role) at endpoint [$endpoint]", "Session role [${sessionRole?.name}] not authorized for endpoint [$endpoint]")
+            constructor(currentUserRole: UserRole?, expectedUserRole: UserRole) : super(HttpStatus.FORBIDDEN, "Not enough privileges: Session's user-role is [$currentUserRole] and expected role is [$expectedUserRole]")
+            constructor(userRole: UserRole?, endpoint: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges (insufficient role) at endpoint [$endpoint]", "Session role [${userRole?.name}] not authorized for endpoint [$endpoint]")
             constructor(permissionList: List<Permission>, method: String) : super(HttpStatus.FORBIDDEN, "Not enough privileges for method: Insufficient permission", "Session permissions [${permissionList.toList()}] not authorized for method $method")
             constructor(errorMessage: String, debugMessage: String = errorMessage): super(HttpStatus.FORBIDDEN, errorMessage, debugMessage)
         }
@@ -40,6 +44,7 @@ class ApiExceptionModule {
 
     class User {
         class UserNotFoundException: ApiException {
+            constructor(uuid: UUID) : super(HttpStatus.NO_CONTENT, "User $uuid not found")
             constructor(id: Long) : super(HttpStatus.NO_CONTENT, "User $id not found")
             constructor(email: String) : super(HttpStatus.NO_CONTENT, "User $email not found")
         }

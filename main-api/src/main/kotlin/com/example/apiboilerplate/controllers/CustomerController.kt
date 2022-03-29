@@ -3,25 +3,24 @@ package com.example.apiboilerplate.controllers
 import com.example.apiboilerplate.base.annotations.SecuredPermission
 import com.example.apiboilerplate.base.annotations.SecuredRole
 import com.example.apiboilerplate.dtos.auth.*
-import com.example.apiboilerplate.dtos.users.CustomerDTO
 import com.example.apiboilerplate.dtos.users.CustomerProfileDTO
 import com.example.apiboilerplate.enums.Permission
 import com.example.apiboilerplate.enums.UserRole
-import com.example.apiboilerplate.exceptions.ApiExceptionModule
 import com.example.apiboilerplate.services.user.AppUserService
-import com.example.apiboilerplate.services.user.CustomerService
+import com.example.apiboilerplate.services.user.CustomerProfileService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.util.*
 import javax.transaction.Transactional
 import javax.validation.Valid
 
 @RestController
 @RequestMapping("/api/v1/customer")
 class CustomerController(
-    private val customerService: CustomerService,
+    private val customerService: CustomerProfileService,
     private val appUserService: AppUserService
 ): AbstractController() {
 
@@ -30,13 +29,13 @@ class CustomerController(
     @PostMapping("/login")
     @Transactional
     fun login(@RequestBody @Valid loginRequestDTO: LoginRequestDTO): ResponseEntity<ResponsePayload<LoginCustomerResponseDTO>> {
-        return response(customerService.login(loginRequestDTO), HttpStatus.OK)
+        return response(customerService.login(loginRequestDTO, UserRole.CUSTOMER), HttpStatus.OK)
     }
 
     @PostMapping("/sign_up")
     @Transactional
     fun signUp(@RequestBody @Valid signUpRequestDTO: SignUpRequestDTO): ResponseEntity<ResponsePayload<LoginCustomerResponseDTO>> {
-        return response(customerService.signUp(signUpRequestDTO), HttpStatus.OK)
+        return response(customerService.signUp(signUpRequestDTO, UserRole.CUSTOMER), HttpStatus.OK)
     }
 
     @PostMapping("/forgot_password")
@@ -48,8 +47,8 @@ class CustomerController(
     @SecuredRole([UserRole.CUSTOMER])
     @PostMapping("/reset_password")
     @Transactional
-    fun resetPassword(@RequestBody resetPasswordRequest: ResetPasswordRequest): ResponseEntity<ResponsePayload<Any?>> {
-        return response(appUserService.resetPassword(resetPasswordRequest), HttpStatus.OK)
+    fun resetPassword(@RequestBody resetPasswordRequestDTO: ResetPasswordRequestDTO): ResponseEntity<ResponsePayload<Any?>> {
+        return response(appUserService.resetPassword(resetPasswordRequestDTO), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
@@ -64,20 +63,8 @@ class CustomerController(
 
     @SecuredRole([UserRole.CUSTOMER])
     @GetMapping("/get_current_user")
-    fun getCurrentUser(): ResponseEntity<ResponsePayload<CustomerDTO>> {
-        return response(customerService.getCurrentCustomerDto(), HttpStatus.OK)
-    }
-
-    @SecuredRole([UserRole.ADMIN])
-    @GetMapping("/get_customer_by_email")
-    fun getCustomerByEmail(@RequestParam email: String): ResponseEntity<ResponsePayload<CustomerProfileDTO>> {
-        val appUserDto = customerService.getCustomerDtoByEmail(email)
-
-        if (appUserDto != null) {
-            return response(appUserDto, HttpStatus.OK)
-        } else {
-            throw ApiExceptionModule.User.UserNotFoundException(email)
-        }
+    fun getCurrentUser(): ResponseEntity<ResponsePayload<CustomerProfileDTO>> {
+        return response(customerService.getCurrentDtoOrThrow(), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
@@ -86,27 +73,35 @@ class CustomerController(
         return customerService.downloadCurrentUserProfileImage()
     }
 
+    @SecuredRole([UserRole.ADMIN])
+    @GetMapping("/get_all_users")
+    fun getAllUsers(@RequestParam pageNumber: Int, @RequestParam pageSize: Int): ResponseEntity<ResponsePayload<List<CustomerProfileDTO>>> {
+        return response(customerService.getAllPaginated(pageNumber, pageSize), HttpStatus.OK)
+    }
+
     // POST ENDPOINTS
 
     @SecuredRole([UserRole.CUSTOMER])
     @PostMapping("/update_current_user")
     @Transactional
-    fun updateCurrentUser(@RequestBody newCustomerDTO: CustomerDTO): ResponseEntity<ResponsePayload<CustomerDTO>> {
-        return response(customerService.updateCurrentCustomer(newCustomerDTO), HttpStatus.OK)
+    fun updateCurrentUser(@RequestBody newCustomerProfileDTO: CustomerProfileDTO): ResponseEntity<Any> {
+        customerService.updateCurrentOrThrow(newCustomerProfileDTO)
+        return response(HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/update_customer")
     @Transactional
-    fun updateCustomer(@RequestBody newCustomerDTO: CustomerDTO): ResponseEntity<ResponsePayload<CustomerDTO>> {
-        return response(customerService.updateCustomer(newCustomerDTO), HttpStatus.OK)
+    fun updateCustomer(@RequestBody newCustomerProfileDTO: CustomerProfileDTO): ResponseEntity<Any> {
+        customerService.update(newCustomerProfileDTO)
+        return response(HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.ADMIN])
     @PostMapping("/delete_customer")
     @Transactional
-    fun deleteCustomer(@RequestParam customerId: Long): ResponseEntity<ResponsePayload<Any?>> {
-        return response(customerService.deleteCustomer(customerId), HttpStatus.OK)
+    fun deleteCustomer(@RequestParam userUuid: UUID): ResponseEntity<ResponsePayload<Any?>> {
+        return response(customerService.softDelete(userUuid), HttpStatus.OK)
     }
 
     @SecuredRole([UserRole.CUSTOMER])
@@ -117,7 +112,7 @@ class CustomerController(
     )
     @Transactional
     fun uploadProfileImage(@RequestParam file: MultipartFile): ResponseEntity<ResponsePayload<Any?>> {
-        return response(customerService.uploadProfileImage(file), HttpStatus.OK)
+        return response(customerService.saveCurrentUserProfileImage(file), HttpStatus.OK)
     }
 
 }

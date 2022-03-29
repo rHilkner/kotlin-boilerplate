@@ -1,8 +1,8 @@
 package com.example.apiboilerplate.dtos.auth
 
-import com.example.apiboilerplate.dtos.users.AdminDTO
+import com.example.apiboilerplate.dtos.users.AdminProfileDTO
 
 class LoginAdminResponseDTO(
-    admin: AdminDTO,
+    admin: AdminProfileDTO,
     apiSession: ApiSessionResponseDTO
-) : LoginResponseDTO(admin, apiSession)
+) : BaseLoginResponseDTO(admin, apiSession)

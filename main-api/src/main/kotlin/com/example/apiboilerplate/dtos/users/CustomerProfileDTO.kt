@@ -3,7 +3,7 @@ package com.example.apiboilerplate.dtos.users
 import com.example.apiboilerplate.models.user.CustomerProfile
 import com.fasterxml.jackson.annotation.JsonProperty
 
-class CustomerProfileDTO(customerProfile: CustomerProfile): UserProfileDTO() {
+class CustomerProfileDTO(customerProfile: CustomerProfile): BaseUserProfileDTO(customerProfile) {
 
     @JsonProperty("phone")
     var phone: String? = null
@@ -11,17 +11,9 @@ class CustomerProfileDTO(customerProfile: CustomerProfile): UserProfileDTO() {
     @JsonProperty("documentId")
     var documentId: String? = null
 
-    @JsonProperty("address")
-    var address: String? = null
-
-    @JsonProperty("addressComplement")
-    var addressComplement: String? = null
-
     init {
         this.phone = customerProfile.phone
         this.documentId = customerProfile.documentId
-        this.address = customerProfile.address
-        this.addressComplement = customerProfile.addressComplement
     }
 
 }

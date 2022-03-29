@@ -4,6 +4,7 @@ import com.example.apiboilerplate.dtos.auth.SignUpRequestDTO
 import com.example.apiboilerplate.enums.StatusCd
 import com.example.apiboilerplate.enums.UserRole
 import com.example.apiboilerplate.models.base.DbSoftDelete
+import org.hibernate.annotations.Type
 import java.util.*
 import javax.persistence.*
 
@@ -17,6 +18,7 @@ class AppUser(): DbSoftDelete() {
     val userId: Long? = null
 
     @Column(name = "user_uuid")
+    @Type(type="org.hibernate.type.UUIDBinaryType")
     lateinit var userUuid: UUID
 
     @Convert(converter = UserRole.Converter::class)
