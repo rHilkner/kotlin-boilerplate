@@ -2,7 +2,7 @@
 
 ## Description
 
-This is a Kotlin API with a robust foundation and few example endpoints. Out of the box, open source solution to start developing an API in Kotlin without having to waste time on config, logging, security setup.
+This is a Kotlin API with a robust foundation on basic config, database (Postgres), logging, CORS and security setup. Optional integration with New Relic for performance monitoring and SMTP service for emailing. Database tables for api_log (saves all incoming requests) and smtp_log (saves all emails sent).
 
 ## Backend (API)
 
